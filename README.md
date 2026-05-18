@@ -167,5 +167,5 @@ MIT License
 ---
 
 <div align="center">
-  <p>Built with ❄️ by King Ice</p>
+  <p>Built with 💙 by King Ice</p>
 </div>

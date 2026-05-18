@@ -130,3 +130,42 @@
 | ![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?logo=github) | Version Control |
 
 ---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- **Node.js** v18.0 or higher
+- **MongoDB Atlas** account (free tier)
+- **npm** v9 or higher
+
+### Quick Start
+
+```bash
+git clone https://github.com/Kingice97/King-Ice-Quiz.git
+cd King-Ice-Quiz
+
+# Backend
+cd BACKEND
+npm install
+npm start
+
+# Frontend (new terminal)
+cd FRONTEND
+npm install
+npm start 
+
+```
+
+Frontend: http://localhost:3000 | Backend: http://localhost:5000
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+<div align="center">
+  <p>Built with ❄️ by King Ice</p>
+</div>

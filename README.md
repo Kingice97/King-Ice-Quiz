@@ -1,15 +1,32 @@
-# Create README
-cat > README.md << 'EOF'
-# King Ice Quiz
+# King Ice Quiz - Full-Stack Quiz & Social Learning Platform
 
-A full-stack quiz application.
+A full-stack web application with interactive quizzes, real-time chat, user profiles, leaderboards, and an admin dashboard.
 
-## Structure
-- `FRONTEND/` - React frontend
-- `BACKEND/` - Node.js/Express backend
+**6 months in production** | **React + Node.js + MongoDB** | **Real-time Chat**
 
-## Setup
-1. Install dependencies: `cd FRONTEND && npm install`, `cd ../BACKEND && npm install`
-2. Start backend: `cd BACKEND && npm start`
-3. Start frontend: `cd FRONTEND && npm start`
-EOF
+## Live Demo
+- Frontend: https://king-ice-quiz.vercel.app
+- Backend API: https://king-ice-quiz-app.onrender.com
+
+## Features
+- Multiple quiz categories & difficulty levels
+- Real-time chat with WebSocket
+- Leaderboards & rankings
+- User profiles with achievements
+- Admin dashboard
+- Dark/Light theme
+- Mobile responsive
+- JWT authentication
+
+## Tech Stack
+**Frontend:** React 18, React Router, Socket.io Client, Chart.js, CSS3
+**Backend:** Node.js, Express, MongoDB, Mongoose, Socket.io, JWT, bcrypt
+**Deployment:** Vercel (Frontend), Render (Backend)
+
+## Project Structure
+├── FRONTEND/          # React app
+├── BACKEND/           # Express API
+
+## Run Locally
+Backend: cd BACKEND && npm install && npm start
+Frontend: cd FRONTEND && npm install && npm start

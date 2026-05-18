@@ -37,9 +37,8 @@ import LeaderboardPage from './pages/Admin/LeaderboardPage';
 
 import './App.css';
 
-// Keep-alive service - Add this function
+// Keep-alive service
 const startKeepAlive = () => {
-  // Only run in production
   if (process.env.NODE_ENV !== 'production') {
     console.log('🔔 KeepAlive: Disabled in development');
     return;
@@ -54,7 +53,6 @@ const startKeepAlive = () => {
 
   console.log('🔔 KeepAlive: Starting service for backend:', backendUrl);
 
-  // Ping immediately when app starts
   fetch(`${backendUrl}/health`)
     .then(response => {
       if (response.ok) {
@@ -67,7 +65,6 @@ const startKeepAlive = () => {
       console.warn('⚠️ KeepAlive: Initial ping error', error.message);
     });
 
-  // Ping every 10 minutes (600,000 ms)
   const intervalId = setInterval(async () => {
     try {
       const response = await fetch(`${backendUrl}/health`, {
@@ -85,20 +82,17 @@ const startKeepAlive = () => {
     } catch (error) {
       console.warn('⚠️ KeepAlive: Backend ping error', error.message);
     }
-  }, 10 * 60 * 1000); // 10 minutes
+  }, 10 * 60 * 1000);
 
-  // Return cleanup function
   return () => {
     clearInterval(intervalId);
     console.log('🔔 KeepAlive: Service stopped');
   };
 };
 
-// Layout wrapper component to conditionally show header/footer
+// Layout wrapper component
 const Layout = ({ children }) => {
   const location = useLocation();
-  
-  // Hide header and footer on chat pages
   const isChatPage = location.pathname === '/chat';
   
   return (
@@ -116,31 +110,35 @@ function App() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [installDismissed, setInstallDismissed] = useState(
+    localStorage.getItem('pwa_install_dismissed') === 'true'
+  );
 
   useEffect(() => {
-    // Initialize security features
     initSecurity();
 
-    // ========== KEEP-ALIVE SERVICE ==========
     const keepAliveCleanup = startKeepAlive();
 
-    // ========== PWA INSTALLATION HANDLING ==========
+    // ========== PWA INSTALLATION HANDLING (FIXED) ==========
     const handleBeforeInstallPrompt = (e) => {
-      // Prevent the default browser install prompt
       e.preventDefault();
-      // Store the event so we can trigger it later
       setDeferredPrompt(e);
-      // Show our custom install button
-      setShowInstallPrompt(true);
+      
+      // Only show if user hasn't permanently dismissed
+      if (!installDismissed && !localStorage.getItem('pwa_install_dismissed')) {
+        setTimeout(() => {
+          setShowInstallPrompt(true);
+        }, 3000);
+      }
       
       console.log('📱 PWA: Install prompt available');
     };
 
     const handleAppInstalled = () => {
       console.log('🎉 PWA: App was successfully installed');
-      // Hide install prompt after successful installation
       setShowInstallPrompt(false);
       setDeferredPrompt(null);
+      localStorage.removeItem('pwa_install_dismissed');
     };
 
     // ========== OFFLINE DETECTION ==========
@@ -154,33 +152,22 @@ function App() {
       setIsOnline(false);
     };
 
-    // Add event listeners
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Auto-show install prompt after 8 seconds if not shown yet
-    const installTimer = setTimeout(() => {
-      if (deferredPrompt && !showInstallPrompt) {
-        setShowInstallPrompt(true);
-      }
-    }, 8000);
-
-    // Cleanup function
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      clearTimeout(installTimer);
       
-      // Cleanup keep-alive service
       if (keepAliveCleanup) {
         keepAliveCleanup();
       }
     };
-  }, [deferredPrompt, showInstallPrompt]);
+  }, [installDismissed]);
 
   // ========== INSTALL PROMPT HANDLER ==========
   const handleInstallClick = async () => {
@@ -190,28 +177,31 @@ function App() {
     }
 
     try {
-      // Show the native install prompt
       deferredPrompt.prompt();
-      
-      // Wait for user to respond to the prompt
       const { outcome } = await deferredPrompt.userChoice;
       
       console.log(`📱 User response to install prompt: ${outcome}`);
       
-      // Clear the saved prompt since it can't be used again
       setDeferredPrompt(null);
-      
-      // Hide our custom prompt regardless of outcome
       setShowInstallPrompt(false);
       
       if (outcome === 'accepted') {
         console.log('✅ User accepted the install prompt');
+        localStorage.removeItem('pwa_install_dismissed');
       } else {
         console.log('❌ User dismissed the install prompt');
+        localStorage.setItem('pwa_install_dismissed', 'true');
+        setInstallDismissed(true);
       }
     } catch (error) {
       console.error('❌ Error showing install prompt:', error);
     }
+  };
+
+  const handleDismissInstall = () => {
+    setShowInstallPrompt(false);
+    localStorage.setItem('pwa_install_dismissed', 'true');
+    setInstallDismissed(true);
   };
 
   const InstallPrompt = () => (
@@ -281,7 +271,7 @@ function App() {
           Install App
         </button>
         <button 
-          onClick={() => setShowInstallPrompt(false)}
+          onClick={handleDismissInstall}
           style={{
             background: 'rgba(255, 255, 255, 0.2)',
             color: 'white',
@@ -302,7 +292,6 @@ function App() {
     </div>
   );
 
-  // ========== OFFLINE INDICATOR COMPONENT ==========
   const OfflineIndicator = () => (
     <div className="offline-indicator">
       <span>📶 You are currently offline</span>
@@ -315,20 +304,15 @@ function App() {
         <QuizProvider>
           <SocketProvider>
             <Router>
-              {/* Offline Indicator */}
               {!isOnline && <OfflineIndicator />}
-              
-              {/* PWA Install Prompt */}
               {showInstallPrompt && <InstallPrompt />}
               
               <Routes>
-                {/* Public routes */}
                 <Route path="/" element={<Layout><Home /></Layout>} />
                 <Route path="/login" element={<Layout><Login /></Layout>} />
                 <Route path="/register" element={<Layout><Register /></Layout>} />
                 <Route path="/quizzes" element={<Layout><QuizList /></Layout>} />
                 
-                {/* Protected routes - regular users */}
                 <Route 
                   path="/quiz/:id" 
                   element={
@@ -362,7 +346,6 @@ function App() {
                   } 
                 />
                 
-                {/* Chat Routes - NO LAYOUT (no header/footer) */}
                 <Route 
                   path="/chat" 
                   element={
@@ -388,7 +371,6 @@ function App() {
                   } 
                 />
                 
-                {/* Admin Routes - protected and admin only */}
                 <Route 
                   path="/admin" 
                   element={
@@ -446,10 +428,7 @@ function App() {
                   } 
                 />
                 
-                {/* Privacy Policy Route - ADD THIS INSIDE Routes */}
                 <Route path="/privacy-policy" element={<Layout><PrivacyPolicy /></Layout>} />
-                
-                {/* 404 page */}
                 <Route path="*" element={<Layout><NotFound /></Layout>} />
               </Routes>
             </Router>

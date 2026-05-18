@@ -28,4 +28,4 @@ Thumbs.db
 # Build output
 FRONTEND/build/
 FRONTEND/dist/
-EOF
+EOFnode_modules/

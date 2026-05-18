@@ -189,7 +189,7 @@ const apiLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 100,
   message: {
     success: false,
     message: 'Too many authentication attempts, please try again later.'
@@ -1144,12 +1144,15 @@ const gracefulShutdown = (signal) => {
       console.log('✅ All users marked as offline.');
     }).catch(err => {
       console.error('Error setting users offline:', err);
-    }).finally(() => {
-      mongoose.connection.close(false, () => {
+    }).finally(async () => {
+      try {
+        await mongoose.connection.close(false);
         console.log('✅ MongoDB connection closed.');
-        console.log('👋 Graceful shutdown completed.');
-        process.exit(0);
-      });
+      } catch (err) {
+        console.error('Error closing MongoDB:', err);
+      }
+      console.log('👋 Graceful shutdown completed.');
+      process.exit(0);
     });
   });
   

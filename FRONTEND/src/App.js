@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { SocketProvider } from './context/SocketContext';
 import Navbar from './components/common/Navbar/Navbar';
 import Footer from './components/common/Footer/Footer';
+import MobileBottomNav from './components/common/MobileBottomNav/MobileBottomNav';
 import ProtectedRoute from './components/common/ProtectedRoute/ProtectedRoute';
 
 // Pages
@@ -102,6 +103,7 @@ const Layout = ({ children }) => {
         {children}
       </main>
       {!isChatPage && <Footer />}
+      {!isChatPage && <MobileBottomNav />}
     </div>
   );
 };
@@ -119,12 +121,11 @@ function App() {
 
     const keepAliveCleanup = startKeepAlive();
 
-    // ========== PWA INSTALLATION HANDLING (FIXED) ==========
+    // ========== PWA INSTALLATION HANDLING ==========
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
       
-      // Only show if user hasn't permanently dismissed
       if (!installDismissed && !localStorage.getItem('pwa_install_dismissed')) {
         setTimeout(() => {
           setShowInstallPrompt(true);
@@ -207,7 +208,7 @@ function App() {
   const InstallPrompt = () => (
     <div style={{
       position: 'fixed',
-      bottom: '20px',
+      bottom: '80px',
       left: '20px',
       right: '20px',
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -265,8 +266,6 @@ function App() {
             fontWeight: 'bold',
             transition: 'all 0.3s ease'
           }}
-          onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
-          onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
         >
           Install App
         </button>
@@ -283,8 +282,6 @@ function App() {
             fontSize: '14px',
             transition: 'all 0.3s ease'
           }}
-          onMouseOver={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.3)'}
-          onMouseOut={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.2)'}
         >
           Not Now
         </button>

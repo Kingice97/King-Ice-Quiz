@@ -58,14 +58,7 @@ const Navbar = () => {
       <nav className="navbar mobile-navbar">
         <div className="navbar-container">
           <div className="navbar-header">
-            <button 
-              className="menu-toggle"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
-            </button>
-            
+            {/* Logo only - no hamburger */}
             <Link to="/" className="navbar-brand">
               <img src="/brain-icon.png" alt="King Ice Quiz" className="brand-logo" />
               <span className="brand-text">King Ice Quiz</span>
@@ -78,58 +71,6 @@ const Navbar = () => {
             >
               {isDark ? <FaSun /> : <FaMoon />}
             </button>
-          </div>
-
-          <div className={`mobile-overlay ${isMobileMenuOpen ? 'active' : ''}`} onClick={() => setIsMobileMenuOpen(false)} />
-          
-          <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-            <div className="mobile-menu-header">
-              <img src="/brain-icon.png" alt="Logo" className="mobile-menu-logo" />
-              <div>
-                <span className="mobile-menu-title">King Ice Quiz</span>
-                {isAuthenticated && <span className="mobile-menu-subtitle">Welcome, {user?.username}</span>}
-              </div>
-            </div>
-
-            <div className="mobile-nav">
-              {navItems.filter(item => item.show).map(item => (
-                <NavLink key={item.path} {...item} mobile={true} />
-              ))}
-            </div>
-
-            <div className="mobile-menu-footer">
-              {isAuthenticated ? (
-                <button className="btn-logout" onClick={handleLogout}>
-                  <FaSignOutAlt /> Sign Out
-                </button>
-              ) : (
-                <div className="mobile-auth-buttons">
-                  <Link to="/login" className="btn btn-outline btn-block" onClick={() => setIsMobileMenuOpen(false)}>
-                    <FaSignInAlt /> Login
-                  </Link>
-                  <Link to="/register" className="btn btn-primary btn-block" onClick={() => setIsMobileMenuOpen(false)}>
-                    <FaUserPlus /> Create Account
-                  </Link>
-                </div>
-              )}
-
-           <div className="mobile-social">
-  <span className="social-heading">Connect With Us</span>
-  <div className="social-icons-row">
-    <a href={contactInfo.whatsappUrl} target="_blank" rel="noopener noreferrer" className="social-circle whatsapp" title="WhatsApp">
-      <FaWhatsapp />
-    </a>
-    <a href={contactInfo.twitterUrl} target="_blank" rel="noopener noreferrer" className="social-circle twitter" title="X (Twitter)">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-      </svg>
-    </a>
-    <a href={`mailto:${contactInfo.email}`} className="social-circle email" title="Email">
-      <FaEnvelope />
-    </a>
-  </div>
-</div>
-            </div>
           </div>
         </div>
       </nav>
@@ -200,23 +141,23 @@ const Navbar = () => {
             </div>
           )}
 
-      {/* Social Links */}
-<div className="sidebar-social">
-  <span className="social-heading">Connect With Us</span>
-  <div className="social-icons-row">
-    <a href={contactInfo.whatsappUrl} target="_blank" rel="noopener noreferrer" className="social-circle whatsapp" title="WhatsApp">
-      <FaWhatsapp />
-    </a>
-    <a href={contactInfo.twitterUrl} target="_blank" rel="noopener noreferrer" className="social-circle twitter" title="X (Twitter)">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-      </svg>
-    </a>
-    <a href={`mailto:${contactInfo.email}`} className="social-circle email" title="Email">
-      <FaEnvelope />
-    </a>
-  </div>
-</div>
+          {/* Social Links */}
+          <div className="sidebar-social">
+            <span className="social-heading">Connect With Us</span>
+            <div className="social-icons-row">
+              <a href={contactInfo.whatsappUrl} target="_blank" rel="noopener noreferrer" className="social-circle whatsapp" title="WhatsApp">
+                <FaWhatsapp />
+              </a>
+              <a href={contactInfo.twitterUrl} target="_blank" rel="noopener noreferrer" className="social-circle twitter" title="X (Twitter)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+              <a href={`mailto:${contactInfo.email}`} className="social-circle email" title="Email">
+                <FaEnvelope />
+              </a>
+            </div>
+          </div>
         </div>
       </aside>
     </>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { FaExclamationTriangle, FaChartBar, FaEdit, FaUser, FaQuestionCircle, FaBullseye, FaLightbulb, FaStar } from 'react-icons/fa';
 import './Analytics.css';
 
 const Analytics = () => {
@@ -20,7 +21,6 @@ const Analytics = () => {
       setError(null);
       
       try {
-        // Try to fetch real data first
         const token = localStorage.getItem('token');
         const response = await fetch(`/api/admin/stats?range=${timeRange}`, {
           headers: {
@@ -38,8 +38,6 @@ const Analytics = () => {
           }
         }
 
-        // If real API fails, use mock data as fallback
-        console.log('Using mock analytics data - backend endpoint not ready');
         const mockData = {
           totalQuizzes: 0,
           totalUsers: 0,
@@ -51,8 +49,6 @@ const Analytics = () => {
         setAnalyticsData(mockData);
         
       } catch (error) {
-        console.log('Analytics API not available, using mock data:', error);
-        // Use mock data when API is not available
         const mockData = {
           totalQuizzes: 0,
           totalUsers: 0,
@@ -81,11 +77,7 @@ const Analytics = () => {
             </p>
           </div>
           <div className="time-filter">
-            <select 
-              value={timeRange} 
-              onChange={(e) => setTimeRange(e.target.value)}
-              disabled
-            >
+            <select value={timeRange} disabled>
               <option value="7days">Last 7 Days</option>
               <option value="30days">Last 30 Days</option>
               <option value="90days">Last 90 Days</option>
@@ -112,10 +104,7 @@ const Analytics = () => {
             </p>
           </div>
           <div className="time-filter">
-            <select 
-              value={timeRange} 
-              onChange={(e) => setTimeRange(e.target.value)}
-            >
+            <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)}>
               <option value="7days">Last 7 Days</option>
               <option value="30days">Last 30 Days</option>
               <option value="90days">Last 90 Days</option>
@@ -124,13 +113,10 @@ const Analytics = () => {
           </div>
         </div>
         <div className="error-state">
-          <div className="error-icon">⚠️</div>
+          <div className="error-icon"><FaExclamationTriangle /></div>
           <h3>Unable to Load Analytics</h3>
           <p>{error}</p>
-          <button 
-            className="btn-primary"
-            onClick={() => window.location.reload()}
-          >
+          <button className="btn-primary" onClick={() => window.location.reload()}>
             Try Again
           </button>
         </div>
@@ -148,10 +134,7 @@ const Analytics = () => {
           </p>
         </div>
         <div className="time-filter">
-          <select 
-            value={timeRange} 
-            onChange={(e) => setTimeRange(e.target.value)}
-          >
+          <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)}>
             <option value="7days">Last 7 Days</option>
             <option value="30days">Last 30 Days</option>
             <option value="90days">Last 90 Days</option>
@@ -160,11 +143,10 @@ const Analytics = () => {
         </div>
       </div>
 
-      {/* Show empty state if no data exists */}
       {analyticsData && analyticsData.totalAttempts === 0 && (
         <div className="empty-state">
           <div className="empty-icon">
-            <i>👨‍💼</i>
+            <FaChartBar />
           </div>
           <h3>Your Analytics Dashboard is Ready</h3>
           <p>This dashboard will show insights specifically for <strong>your quizzes and your users</strong>.</p>
@@ -172,10 +154,10 @@ const Analytics = () => {
             Once you create quizzes and users start taking them, you'll see:
           </p>
           <ul className="features-list">
-            <li>📊 Performance of <strong>your quizzes</strong></li>
-            <li>👥 Users who took <strong>your quizzes</strong></li>
-            <li>⭐ Average scores on <strong>your content</strong></li>
-            <li>📈 Growth metrics for <strong>your audience</strong></li>
+            <li><FaChartBar /> Performance of <strong>your quizzes</strong></li>
+            <li><FaUser /> Users who took <strong>your quizzes</strong></li>
+            <li><FaStar /> Average scores on <strong>your content</strong></li>
+            <li><FaChartBar /> Growth metrics for <strong>your audience</strong></li>
           </ul>
           <div className="development-note">
             <p><strong>Note:</strong> The analytics backend is being prepared and will work fully when deployed.</p>
@@ -183,16 +165,14 @@ const Analytics = () => {
         </div>
       )}
 
-      {/* Show data when available */}
       {analyticsData && analyticsData.totalAttempts > 0 && (
         <>
-          {/* My Content Overview */}
           <div className="admin-content-section">
             <h3>My Content Overview</h3>
             <div className="stats-grid">
               <div className="stat-card admin-specific">
                 <div className="stat-icon my-quizzes">
-                  <i>📝</i>
+                  <FaEdit />
                 </div>
                 <div className="stat-info">
                   <h3>My Quizzes</h3>
@@ -203,7 +183,7 @@ const Analytics = () => {
 
               <div className="stat-card admin-specific">
                 <div className="stat-icon my-users">
-                  <i>👤</i>
+                  <FaUser />
                 </div>
                 <div className="stat-info">
                   <h3>My Quiz Takers</h3>
@@ -214,7 +194,7 @@ const Analytics = () => {
 
               <div className="stat-card admin-specific">
                 <div className="stat-icon my-questions">
-                  <i>❓</i>
+                  <FaQuestionCircle />
                 </div>
                 <div className="stat-info">
                   <h3>My Questions</h3>
@@ -225,7 +205,7 @@ const Analytics = () => {
 
               <div className="stat-card admin-specific">
                 <div className="stat-icon my-score">
-                  <i>🎯</i>
+                  <FaBullseye />
                 </div>
                 <div className="stat-info">
                   <h3>Avg Score (My Quizzes)</h3>
@@ -236,14 +216,13 @@ const Analytics = () => {
             </div>
           </div>
 
-          {/* Recent Activity */}
           {analyticsData.recentActivity && analyticsData.recentActivity.length > 0 && (
             <div className="recent-activity">
               <h3>Recent Activity on My Quizzes</h3>
               <div className="activity-list">
                 {analyticsData.recentActivity.slice(0, 5).map((activity, index) => (
                   <div key={index} className="activity-item">
-                    <div className="activity-icon">📝</div>
+                    <div className="activity-icon"><FaEdit /></div>
                     <div className="activity-info">
                       <p><strong>{activity.userName}</strong> completed <strong>{activity.quizId?.title || 'Your Quiz'}</strong></p>
                       <span>Score: {activity.percentage}% • Time: {Math.round(activity.timeTaken / 60)}min</span>
@@ -259,7 +238,6 @@ const Analytics = () => {
         </>
       )}
 
-      {/* Show placeholder charts that will populate with real data */}
       <div className="charts-grid">
         <div className="chart-card">
           <h3>My Users Growth</h3>
@@ -314,9 +292,8 @@ const Analytics = () => {
         </div>
       </div>
 
-      {/* Admin-specific tips */}
       <div className="admin-tips">
-        <h4>💡 Analytics Status</h4>
+        <h4><FaLightbulb /> Analytics Status</h4>
         <div className="tips-grid">
           <div className="tip-card">
             <h5>Current Status</h5>

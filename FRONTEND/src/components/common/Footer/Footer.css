@@ -167,3 +167,11 @@
   width: 20px;
   height: 20px;
 }
+
+.footer-logo-image {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 8px;
+}

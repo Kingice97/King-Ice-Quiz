@@ -6,6 +6,7 @@ import { quizService } from '../../services/quizService';
 import { userService } from '../../services/userService';
 import QuizCard from '../../components/quiz/QuizCard/QuizCard';
 import Loading from '../../components/common/Loading/Loading';
+import { FaBrain, FaRocket, FaChartBar, FaTrophy, FaComments, FaBook, FaBolt, FaUsers, FaChartLine, FaEdit, FaCog } from 'react-icons/fa';
 import './Home.css';
 
 const Home = () => {
@@ -28,23 +29,19 @@ const Home = () => {
   const users = usersData?.data || [];
   const results = resultsData?.data || [];
 
-  // Calculate stats for admin dashboard - EXCLUDE ADMIN USERS
   const activeQuizzes = featuredQuizzes.length;
   const regularUsers = users.filter(user => user.role === 'user');
   const totalUsers = regularUsers.length;
   const totalAttempts = results.length;
   
-  // Calculate active users (only regular users, no admin)
   const activeUsers = regularUsers.filter(user => 
     user.isActive === true || 
     (user.lastLogin && new Date(user.lastLogin) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
   ).length;
 
-  // If user is admin, show admin-specific content
   if (isAdmin) {
     return (
       <div className="home">
-        {/* Admin Hero Section */}
         <section className="hero admin-hero">
           <div className="hero-content">
             <div className="hero-text">
@@ -64,13 +61,12 @@ const Home = () => {
             </div>
             <div className="hero-image">
               <div className="hero-graphic admin-graphic">
-                <span className="graphic-icon">⚙️</span>
+                <FaCog className="graphic-icon" />
               </div>
             </div>
           </div>
         </section>
 
-        {/* Admin Quick Stats */}
         <section className="admin-stats">
           <div className="container">
             <h2>Platform Overview</h2>
@@ -79,14 +75,14 @@ const Home = () => {
             ) : (
               <div className="stats-grid">
                 <div className="stat-card">
-                  <div className="stat-icon">📊</div>
+                  <div className="stat-icon"><FaChartBar /></div>
                   <div className="stat-info">
                     <span className="stat-value">{activeQuizzes}</span>
                     <span className="stat-label">Active Quizzes</span>
                   </div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-icon">👥</div>
+                  <div className="stat-icon"><FaUsers /></div>
                   <div className="stat-info">
                     <span className="stat-value">{totalUsers}</span>
                     <span className="stat-label">Total Users</span>
@@ -96,7 +92,7 @@ const Home = () => {
                   </div>
                 </div>
                 <div className="stat-card">
-                  <div className="stat-icon">📈</div>
+                  <div className="stat-icon"><FaChartLine /></div>
                   <div className="stat-info">
                     <span className="stat-value">{activeUsers}</span>
                     <span className="stat-label">Active Users</span>
@@ -110,13 +106,12 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Admin Quick Actions */}
         <section className="admin-actions">
           <div className="container">
             <h2>Quick Actions</h2>
             <div className="actions-grid">
               <Link to="/admin/quizzes" className="action-card">
-                <div className="action-icon">📝</div>
+                <div className="action-icon"><FaEdit /></div>
                 <div className="action-content">
                   <h3>Manage Quizzes</h3>
                   <p>Create, edit, and organize all quizzes in the system</p>
@@ -124,7 +119,7 @@ const Home = () => {
                 <div className="action-arrow">→</div>
               </Link>
               <Link to="/admin/users" className="action-card">
-                <div className="action-icon">👥</div>
+                <div className="action-icon"><FaUsers /></div>
                 <div className="action-content">
                   <h3>User Management</h3>
                   <p>View and manage all registered users and their activity</p>
@@ -132,15 +127,15 @@ const Home = () => {
                 <div className="action-arrow">→</div>
               </Link>
               <Link to="/admin/results" className="action-card">
-                <div className="action-icon">📈</div>
+                <div className="action-icon"><FaChartLine /></div>
                 <div className="action-content">
                   <h3>View Results</h3>
                   <p>Analyze quiz attempts and user performance data</p>
                 </div>
                 <div className="action-arrow">→</div>
               </Link>
-              <Link to="/admin"className="action-card">
-                <div className="action-icon">⚙️</div>
+              <Link to="/admin" className="action-card">
+                <div className="action-icon"><FaCog /></div>
                 <div className="action-content">
                   <h3>Admin Dashboard</h3>
                   <p>Platform management and user analytics</p>
@@ -151,7 +146,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Recent Activity Preview */}
         {featuredQuizzes.length > 0 && (
           <section className="recent-activity">
             <div className="container">
@@ -178,10 +172,8 @@ const Home = () => {
     );
   }
 
-  // Regular user home page OR landing page
   return (
     <div className="home">
-      {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
           <div className="hero-text">
@@ -210,36 +202,34 @@ const Home = () => {
           </div>
           <div className="hero-image">
             <div className="hero-graphic">
-              <span className="graphic-icon">🧠</span>
+              <FaBrain className="graphic-icon" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Conditional Features Section */}
       {isAuthenticated ? (
-        /* Your Quiz Journey Section - FOR LOGGED-IN USERS */
         <section className="features">
           <div className="container">
             <h2>Your Quiz Journey</h2>
             <div className="features-grid">
               <div className="feature-card">
-                <div className="feature-icon">🚀</div>
+                <div className="feature-icon"><FaRocket /></div>
                 <h3>Continue Learning</h3>
                 <p>Pick up where you left off and discover new quizzes tailored to your interests.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">📊</div>
+                <div className="feature-icon"><FaChartBar /></div>
                 <h3>Track Progress</h3>
                 <p>Monitor your improvement with detailed analytics and personal performance stats.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🏆</div>
+                <div className="feature-icon"><FaTrophy /></div>
                 <h3>Climb Rankings</h3>
                 <p>Compete with others and watch your position rise on the global leaderboard.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">💬</div>
+                <div className="feature-icon"><FaComments /></div>
                 <h3>Join Conversations</h3>
                 <p>Chat with fellow quiz enthusiasts and share knowledge in real-time.</p>
               </div>
@@ -247,28 +237,27 @@ const Home = () => {
           </div>
         </section>
       ) : (
-        /* Why Choose Section - FOR LANDING PAGE (non-logged-in) */
         <section className="features">
           <div className="container">
             <h2>Why Choose King Ice Quiz?</h2>
             <div className="features-grid">
               <div className="feature-card">
-                <div className="feature-icon">📚</div>
+                <div className="feature-icon"><FaBook /></div>
                 <h3>Diverse Categories</h3>
                 <p>From science to entertainment, we have quizzes for every interest and knowledge level.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">⚡</div>
+                <div className="feature-icon"><FaBolt /></div>
                 <h3>Instant Feedback</h3>
                 <p>Get immediate results with detailed explanations and performance analytics.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">🏆</div>
+                <div className="feature-icon"><FaTrophy /></div>
                 <h3>Compete & Learn</h3>
                 <p>Climb the leaderboards, earn achievements, and track your learning progress.</p>
               </div>
               <div className="feature-card">
-                <div className="feature-icon">💬</div>
+                <div className="feature-icon"><FaComments /></div>
                 <h3>Real-time Chat</h3>
                 <p>Chat with other quiz enthusiasts, discuss questions, and share knowledge in real-time.</p>
               </div>
@@ -277,7 +266,6 @@ const Home = () => {
         </section>
       )}
 
-      {/* Featured Quizzes */}
       <section className="featured-quizzes">
         <div className="container">
           <div className="section-header">
@@ -299,7 +287,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Leaderboard Section */}
       {leaderboard.length > 0 && (
         <section className="leaderboard">
           <div className="container">
@@ -326,7 +313,6 @@ const Home = () => {
         </section>
       )}
 
-      {/* CTA Section */}
       {!isAuthenticated && (
         <section className="cta">
           <div className="container">

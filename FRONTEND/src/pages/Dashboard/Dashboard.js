@@ -6,6 +6,7 @@ import { useApi } from '../../hooks/useApi';
 import { quizService } from '../../services/quizService';
 import QuizCard from '../../components/quiz/QuizCard/QuizCard';
 import Loading from '../../components/common/Loading/Loading';
+import { FaChartBar, FaStar, FaBullseye, FaClock, FaEdit } from 'react-icons/fa';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -13,14 +14,12 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Redirect admins to admin dashboard automatically
   useEffect(() => {
     if (user?.role === 'admin') {
       navigate('/admin');
     }
   }, [user, navigate]);
 
-  // Only fetch data for regular users (not admins)
   const { data: statsData, loading: statsLoading } = useApi(() =>
     user?.role !== 'admin' ? quizService.getUserStats() : Promise.resolve({ data: { overall: {} } })
   );
@@ -42,7 +41,6 @@ const Dashboard = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  // Show loading while checking user role
   if (user?.role === 'admin') {
     return (
       <div className="dashboard-page">
@@ -69,32 +67,31 @@ const Dashboard = () => {
           <p>Here's your learning progress and recommended quizzes</p>
         </div>
 
-        {/* Quick Stats */}
         {!statsLoading && (
           <div className="quick-stats">
             <div className="stat-card">
-              <div className="stat-icon">📊</div>
+              <div className="stat-icon"><FaChartBar /></div>
               <div className="stat-info">
                 <span className="stat-value">{stats.totalQuizzesTaken || 0}</span>
                 <span className="stat-label">Quizzes Taken</span>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">⭐</div>
+              <div className="stat-icon"><FaStar /></div>
               <div className="stat-info">
                 <span className="stat-value">{Math.round(stats.averageScore || 0)}%</span>
                 <span className="stat-label">Average Score</span>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">🎯</div>
+              <div className="stat-icon"><FaBullseye /></div>
               <div className="stat-info">
                 <span className="stat-value">{Math.round(stats.bestScore || 0)}%</span>
                 <span className="stat-label">Best Score</span>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">⏱️</div>
+              <div className="stat-icon"><FaClock /></div>
               <div className="stat-info">
                 <span className="stat-value">{Math.floor((stats.totalTimeSpent || 0) / 60)}</span>
                 <span className="stat-label">Minutes Learning</span>
@@ -103,7 +100,6 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Dashboard Tabs */}
         <div className="dashboard-tabs">
           <button
             className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
@@ -125,11 +121,9 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Tab Content */}
         <div className="dashboard-content">
           {activeTab === 'overview' && (
             <div className="overview-tab">
-              {/* Recommended Quizzes */}
               <section className="recommended-section">
                 <div className="section-header">
                   <h2>Recommended Quizzes</h2>
@@ -148,7 +142,6 @@ const Dashboard = () => {
                 )}
               </section>
 
-              {/* Recent Activity */}
               <section className="recent-activity">
                 <h2>Recent Activity</h2>
                 {resultsLoading ? (
@@ -157,7 +150,7 @@ const Dashboard = () => {
                   <div className="activity-list">
                     {recentResults.map(result => (
                       <div key={result._id} className="activity-item">
-                        <div className="activity-icon">📝</div>
+                        <div className="activity-icon"><FaEdit /></div>
                         <div className="activity-info">
                           <p>
                             Completed <strong>{result.quizId?.title}</strong>
@@ -232,7 +225,6 @@ const Dashboard = () => {
                 <Loading text="Loading progress data..." />
               ) : (
                 <div className="progress-content">
-                  {/* Category Performance */}
                   {categoryStats.length > 0 && (
                     <div className="category-performance">
                       <h3>Performance by Category</h3>
@@ -261,7 +253,6 @@ const Dashboard = () => {
                     </div>
                   )}
 
-                  {/* Overall Progress */}
                   <div className="overall-progress">
                     <h3>Overall Statistics</h3>
                     <div className="stats-grid">

@@ -260,3 +260,84 @@
   text-align: center;
   font-size: 0.9rem;
 }
+
+/* ========== DARK MODE STYLES ========== */
+.dark .users-management {
+  color: #e0e0e0;
+}
+
+.dark .management-header {
+  border-bottom-color: #444;
+}
+
+.dark .management-header h1 {
+  color: #e0e0e0;
+}
+
+.dark .search-box input {
+  background: #2d2d2d;
+  border-color: #555;
+  color: #e0e0e0;
+}
+
+.dark .search-box input::placeholder {
+  color: #999;
+}
+
+.dark .users-table-container {
+  background: #2d2d2d;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.dark .users-table th {
+  background: #1a1a2e;
+  color: #e0e0e0;
+}
+
+.dark .users-table td {
+  border-bottom-color: #444;
+  color: #e0e0e0;
+}
+
+.dark .user-name {
+  color: #e0e0e0;
+}
+
+.dark .user-username {
+  color: #aaa;
+}
+
+.dark .stat-card {
+  background: #2d2d2d;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.dark .stat-card h3 {
+  color: #aaa;
+}
+
+.dark .stat-number {
+  color: #e0e0e0;
+}
+
+.dark .loading-spinner {
+  border-color: #444;
+  border-top-color: #3498db;
+}
+
+.dark .empty-state,
+.dark .loading-state {
+  color: #ccc;
+}
+
+.dark .message-success {
+  background: rgba(39, 174, 96, 0.2);
+  color: #2ecc71;
+  border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.dark .message-error {
+  background: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+}

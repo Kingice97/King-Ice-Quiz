@@ -10,6 +10,7 @@ import AdminDashboard from '../../components/admin/Dashboard/Dashboard';
 import UsersManagement from './UsersManagement';
 import Loading from '../../components/common/Loading/Loading';
 import Modal from '../../components/common/Modal/Modal';
+import { FaChartBar, FaEdit, FaUsers, FaChartLine } from 'react-icons/fa';
 import './Admin.css';
 
 const Admin = () => {
@@ -18,10 +19,8 @@ const Admin = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState(null);
 
-  // FIXED: Safe data handling with fallbacks
   const { data: quizzesData, loading: quizzesLoading, setData: setQuizzesData } = useApi(async () => {
     try {
-      // Try new admin endpoint first, fallback to regular endpoint
       return await quizService.getAdminQuizzes({ limit: 50 });
     } catch (error) {
       console.log('Admin quizzes endpoint not available, using regular endpoint');
@@ -31,7 +30,6 @@ const Admin = () => {
 
   const { data: resultsData, loading: resultsLoading } = useApi(async () => {
     try {
-      // Try new admin endpoint first, fallback to regular endpoint
       return await quizService.getAdminResults({ limit: 100, sortBy: 'completedAt', sortOrder: 'desc' });
     } catch (error) {
       console.log('Admin results endpoint not available, using regular endpoint');
@@ -47,13 +45,11 @@ const Admin = () => {
     userService.getLeaderboard({ limit: 5 })
   );
 
-  // FIXED: Safe data extraction with null checks
   const quizzes = quizzesData?.data || [];
   const recentResults = resultsData?.data || [];
   const users = usersData?.data || [];
   const userLeaderboard = leaderboardData?.data || [];
 
-  // Calculate admin platform stats with safe defaults
   const regularUsers = Array.isArray(users) ? users.filter(user => user.role === 'user') : [];
   const activeRegularUsers = regularUsers.filter(user => user.isActive === true).length;
   
@@ -67,7 +63,6 @@ const Admin = () => {
       : 0
   };
 
-  // Quiz status management functions
   const handleCloseQuiz = async (quizId) => {
     if (window.confirm('Are you sure you want to close this quiz? Users will no longer be able to take it.')) {
       try {
@@ -212,35 +207,33 @@ const Admin = () => {
           </div>
         </div>
 
-        {/* Admin Tabs */}
         <div className="admin-tabs">
           <button
             className={`tab ${activeTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => setActiveTab('dashboard')}
           >
-            📊 Dashboard
+            <FaChartBar /> Dashboard
           </button>
           <button
             className={`tab ${activeTab === 'quizzes' ? 'active' : ''}`}
             onClick={() => setActiveTab('quizzes')}
           >
-            📝 Quizzes ({quizzes.length})
+            <FaEdit /> Quizzes ({quizzes.length})
           </button>
           <button
             className={`tab ${activeTab === 'users' ? 'active' : ''}`}
             onClick={() => setActiveTab('users')}
           >
-            👥 Users ({regularUsers.length})
+            <FaUsers /> Users ({regularUsers.length})
           </button>
           <button
             className={`tab ${activeTab === 'results' ? 'active' : ''}`}
             onClick={() => setActiveTab('results')}
           >
-            📈 Results ({recentResults.length})
+            <FaChartLine /> Results ({recentResults.length})
           </button>
         </div>
 
-        {/* Tab Content */}
         <div className="admin-content">
           {activeTab === 'dashboard' && (
             <AdminDashboard
@@ -402,7 +395,6 @@ const Admin = () => {
         </div>
       </div>
 
-      {/* Create Quiz Modal */}
       <Modal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
@@ -415,7 +407,6 @@ const Admin = () => {
         />
       </Modal>
 
-      {/* Edit Quiz Modal */}
       <Modal
         isOpen={!!editingQuiz}
         onClose={() => setEditingQuiz(null)}

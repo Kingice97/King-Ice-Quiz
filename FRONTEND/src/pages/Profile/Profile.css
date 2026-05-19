@@ -835,3 +835,44 @@
     padding: 1px 4px;
   }
 }
+
+/* Admin message card - light mode fix */
+.admin-message-card {
+  color: var(--gray-900);
+}
+
+.dark .admin-message-card {
+  color: var(--gray-100);
+}
+
+.admin-message-card h3 {
+  color: var(--gray-900);
+}
+
+.dark .admin-message-card h3 {
+  color: var(--gray-100);
+}
+
+.admin-message-card p {
+  color: var(--gray-700);
+}
+
+.dark .admin-message-card p {
+  color: var(--gray-300);
+}
+
+.admin-stat {
+  color: var(--gray-800);
+}
+
+.dark .admin-stat {
+  color: var(--gray-200);
+}
+
+.admin-stat-icon {
+  color: var(--primary-color);
+}
+
+.dark .admin-stat-icon {
+  color: var(--primary-light);
+}

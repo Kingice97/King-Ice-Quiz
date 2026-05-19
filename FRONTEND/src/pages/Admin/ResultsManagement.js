@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useApi } from '../../hooks/useApi';
 import { quizService } from '../../services/quizService';
 import Loading from '../../components/common/Loading/Loading';
+import { FaChartBar } from 'react-icons/fa';
 import './ResultsManagement.css';
 
 const ResultsManagement = () => {
@@ -10,14 +11,12 @@ const ResultsManagement = () => {
   const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // FIXED: Use getAllResults for admin to see all results
   const { data: resultsData, loading: resultsLoading } = useApi(() =>
     quizService.getAllResults({ limit: 100, sortBy: 'completedAt', sortOrder: 'desc' })
   );
 
   const results = resultsData?.data || [];
 
-  // Filter results based on search and filters
   const filteredResults = results.filter(result => {
     const matchesSearch = 
       result.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -71,7 +70,6 @@ const ResultsManagement = () => {
           </div>
         </div>
 
-        {/* Filters */}
         <div className="filters-section">
           <div className="search-box">
             <input
@@ -101,7 +99,6 @@ const ResultsManagement = () => {
           </div>
         </div>
 
-        {/* Results Table */}
         <div className="results-section">
           {resultsLoading ? (
             <Loading text="Loading results..." />
@@ -123,7 +120,6 @@ const ResultsManagement = () => {
                 </span>
               </div>
 
-              {/* FIXED: Added results-table-wrapper for horizontal scrolling */}
               <div className="results-table-wrapper">
                 <div className="results-table">
                   <div className="table-header">
@@ -171,7 +167,7 @@ const ResultsManagement = () => {
 
                   {filteredResults.length === 0 && (
                     <div className="empty-state">
-                      <div className="empty-icon">📊</div>
+                      <div className="empty-icon"><FaChartBar /></div>
                       <h3>No Results Found</h3>
                       <p>
                         {results.length === 0 

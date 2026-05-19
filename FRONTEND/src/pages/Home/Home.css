@@ -41,7 +41,6 @@
   flex-wrap: wrap;
 }
 
-/* FIXED: Home page button hovers - CORRECTED VERSION */
 .hero-actions .btn-primary {
   background-color: var(--primary-color);
   color: var(--text-inverse) !important;
@@ -56,16 +55,15 @@
 
 .hero-actions .btn-outline {
   background-color: transparent;
-  color: var(--white) !important; /* FIXED: White text on colored background */
+  color: var(--white) !important;
   border: 2px solid var(--white);
 }
 
 .hero-actions .btn-outline:hover {
   background-color: var(--white);
-  color: var(--primary-color) !important; /* FIXED: Primary color on hover */
+  color: var(--primary-color) !important;
 }
 
-/* Admin hero section outline buttons */
 .admin-hero .hero-actions .btn-outline {
   background-color: transparent;
   color: var(--white) !important;
@@ -74,7 +72,7 @@
 
 .admin-hero .hero-actions .btn-outline:hover {
   background-color: var(--white);
-  color: var(--gray-800) !important; /* FIXED: Dark text for admin section */
+  color: var(--gray-800) !important;
 }
 
 .hero-image {
@@ -306,7 +304,6 @@
   color: var(--gray-100);
 }
 
-/* Section header outline buttons */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -363,8 +360,10 @@
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-2xl);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .feature-card {
@@ -476,7 +475,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary-color);
+  background: var(--gray-700);
   color: var(--white);
   border-radius: 50%;
   font-weight: 700;
@@ -538,7 +537,7 @@
 /* CTA Section */
 .cta {
   padding: var(--spacing-3xl) 0;
-  background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: var(--white);
   text-align: center;
 }
@@ -551,7 +550,12 @@
 .cta-content p {
   font-size: var(--font-size-lg);
   margin-bottom: var(--spacing-2xl);
-  opacity: 0.9;
+  opacity: 0.95;
+  color: var(--white);
+}
+
+.cta-content strong {
+  color: #fbbf24;
 }
 
 .cta-actions {
@@ -561,31 +565,68 @@
   flex-wrap: wrap;
 }
 
-/* FIXED: CTA section buttons */
-.cta-actions .btn-primary {
-  background-color: var(--white);
-  color: var(--primary-color) !important;
-  border: 1px solid var(--white);
+.cta-actions .btn.btn-primary {
+  background-color: #ffffff !important;
+  color: #4f46e5 !important;
+  border: 2px solid #ffffff !important;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
 }
 
-.cta-actions .btn-primary:hover {
-  background-color: transparent;
+.cta-actions .btn.btn-outline {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+}
+
+/* Make 'View All Quizzes' a primary button */
+.featured-quizzes .section-header .btn-outline {
+  background-color: var(--primary-color) !important;
+  color: var(--text-inverse) !important;
+  border: 2px solid var(--primary-color) !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.featured-quizzes .section-header .btn-outline:hover {
+  background-color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.dark .featured-quizzes .section-header .btn-outline:hover {
+  background-color: var(--primary-light) !important;
+  border-color: var(--primary-light) !important;
+}
+
+/* COMPLETELY REMOVE all hover effects for Home page outline buttons */
+.home .btn-outline:hover {
+  background-color: transparent !important;
+  color: inherit !important;
+  border-color: inherit !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.hero-actions .btn-outline,
+.admin-hero .hero-actions .btn-outline {
   color: var(--white) !important;
-  border-color: var(--white);
+  border-color: var(--white) !important;
 }
 
-.cta-actions .btn-outline {
-  background-color: transparent;
-  color: var(--white) !important;
-  border: 2px solid var(--white);
+.section-header .btn-outline {
+  color: var(--text-primary) !important;
+  border-color: var(--border-primary) !important;
 }
 
-.cta-actions .btn-outline:hover {
-  background-color: var(--white);
-  color: var(--primary-color) !important;
-}
-
-/* Mobile Styles */
+/* ========== MOBILE STYLES ========== */
 @media (max-width: 768px) {
   .hero-content {
     grid-template-columns: 1fr;
@@ -626,6 +667,8 @@
   
   .features-grid {
     grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
   }
   
   .section-header {
@@ -678,46 +721,4 @@
   .leaderboard-item {
     padding: var(--spacing-md);
   }
-}
-
-/* COMPLETELY REMOVE all hover effects for Home page outline buttons */
-.home .btn-outline:hover {
-  background-color: transparent !important;
-  color: inherit !important;
-  border-color: inherit !important;
-  transform: none !important;
-  box-shadow: none !important;
-}
-
-/* Ensure proper initial colors */
-.hero-actions .btn-outline,
-.admin-hero .hero-actions .btn-outline {
-  color: var(--white) !important;
-  border-color: var(--white) !important;
-}
-
-.section-header .btn-outline {
-  color: var(--text-primary) !important;
-  border-color: var(--border-primary) !important;
-}
-
-/* Make 'View All Quizzes' a primary button */
-.featured-quizzes .section-header .btn-outline {
-  background-color: var(--primary-color) !important;
-  color: var(--text-inverse) !important;
-  border: 2px solid var(--primary-color) !important;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.featured-quizzes .section-header .btn-outline:hover {
-  background-color: var(--primary-dark) !important;
-  border-color: var(--primary-dark) !important;
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.dark .featured-quizzes .section-header .btn-outline:hover {
-  background-color: var(--primary-light) !important;
-  border-color: var(--primary-light) !important;
 }

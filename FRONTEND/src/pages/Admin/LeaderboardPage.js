@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useApi } from '../../hooks/useApi';
 import { userService } from '../../services/userService';
 import Loading from '../../components/common/Loading/Loading';
+import { FaChartBar, FaBullseye, FaStar } from 'react-icons/fa';
 import './LeaderboardPage.css';
 
 const LeaderboardPage = () => {
@@ -13,7 +14,6 @@ const LeaderboardPage = () => {
     userService.getLeaderboard({ limit, timeframe: timeFilter })
   );
 
-  // FIXED: Better data extraction with enhanced debugging
   const leaderboard = React.useMemo(() => {
     if (leaderboardError) {
       console.error('🚨 Leaderboard API error:', leaderboardError);
@@ -32,7 +32,6 @@ const LeaderboardPage = () => {
       data = leaderboardData.leaderboard;
     }
     
-    // FIXED: Enhanced debugging for leaderboard data
     console.log('📊 Leaderboard raw data:', leaderboardData);
     console.log('📊 Processed leaderboard array:', data);
     
@@ -69,17 +68,13 @@ const LeaderboardPage = () => {
     return user.username || user.user?.username || user.userName || 'Unknown User';
   };
 
-  // FIXED: Improved getUserStats to prioritize leaderboard calculated stats
   const getUserStats = (user) => {
     const userObj = user.user || user;
     
-    // FIXED: Use leaderboard-calculated stats first (these are accurate)
     const stats = {
-      // Use top-level leaderboard stats (calculated in aggregation)
       quizzesTaken: user.quizzesTaken || 0,
       averageScore: user.averageScore || 0,
-      // FIXED: Use the bestScore from leaderboard aggregation (this is now calculated correctly)
-      bestScore: user.bestScore || 0, // This now comes from the backend aggregation
+      bestScore: user.bestScore || 0,
       totalPoints: user.totalPoints || 0,
       createdAt: user.createdAt || userObj.createdAt,
       role: user.role || userObj.role,
@@ -122,7 +117,6 @@ const LeaderboardPage = () => {
     }
   };
 
-  // FIXED: Add filter change handlers with debugging
   const handleTimeFilterChange = (value) => {
     console.log(`🕒 Changing time filter to: ${value}`);
     setTimeFilter(value);
@@ -156,7 +150,6 @@ const LeaderboardPage = () => {
                 : 0
               }%
             </span>
-            {/* FIXED: Add best score stats */}
             <span>
               Users with 100% Best: {leaderboard.filter(user => {
                 const stats = getUserStats(user);
@@ -166,7 +159,6 @@ const LeaderboardPage = () => {
           </div>
         </div>
 
-        {/* Filters */}
         <div className="filters-section">
           <div className="filter-group">
             <label>Time Period:</label>
@@ -194,7 +186,6 @@ const LeaderboardPage = () => {
           </div>
         </div>
 
-        {/* Leaderboard */}
         <div className="leaderboard-section">
           {leaderboardLoading ? (
             <Loading text="Loading leaderboard..." />
@@ -239,7 +230,7 @@ const LeaderboardPage = () => {
                             <span className="admin-badge">Admin</span>
                           )}
                           {hasPerfectScore && (
-                            <span className="perfect-score-badge">🎯 100% Best</span>
+                            <span className="perfect-score-badge"><FaBullseye /> 100% Best</span>
                           )}
                         </div>
                       </div>
@@ -257,7 +248,7 @@ const LeaderboardPage = () => {
                           <span className="stat-label">Best Score</span>
                           <span className={`stat-value ${hasPerfectScore ? 'perfect-score' : ''}`}>
                             {Math.round(stats.bestScore)}%
-                            {hasPerfectScore && ' ⭐'}
+                            {hasPerfectScore && ' '}<FaStar style={{display: hasPerfectScore ? 'inline' : 'none'}} />
                           </span>
                         </div>
                         <div className="stat">
@@ -284,7 +275,7 @@ const LeaderboardPage = () => {
 
               {leaderboard.length === 0 && !leaderboardLoading && (
                 <div className="empty-state">
-                  <div className="empty-icon">📊</div>
+                  <div className="empty-icon"><FaChartBar /></div>
                   <h3>No Leaderboard Data</h3>
                   <p>Leaderboard will populate once users start taking quizzes.</p>
                 </div>

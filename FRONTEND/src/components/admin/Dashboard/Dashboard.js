@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FaChartBar, FaUsers, FaCheckCircle, FaChartLine } from 'react-icons/fa';
 import './Dashboard.css';
 
 const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }) => {
@@ -12,7 +13,6 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
     });
   };
 
-  // Calculate user counts EXCLUDING admin (assuming 1 admin user)
   const regularUsersCount = stats.totalUsers || 0;
   const activeRegularUsers = stats.activeUsers || 0;
 
@@ -23,10 +23,9 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
         <p>Platform management and analytics</p>
       </div>
 
-      {/* Platform Overview Stats */}
       <div className="stats-grid">
         <div className="stat-card admin-stat">
-          <div className="stat-icon">📊</div>
+          <div className="stat-icon"><FaChartBar /></div>
           <div className="stat-info">
             <span className="stat-value">{stats.totalQuizzes || 0}</span>
             <span className="stat-label">Total Quizzes</span>
@@ -34,15 +33,15 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
         </div>
         
         <div className="stat-card admin-stat">
-          <div className="stat-icon">👥</div>
+          <div className="stat-icon"><FaUsers /></div>
           <div className="stat-info">
-            <span className="stat-value">{regularUsersCount}</span> {/* FIXED: Show actual total users count */}
+            <span className="stat-value">{regularUsersCount}</span>
             <span className="stat-label">Total Users</span>
           </div>
         </div>
         
         <div className="stat-card admin-stat">
-          <div className="stat-icon">✅</div>
+          <div className="stat-icon"><FaCheckCircle /></div>
           <div className="stat-info">
             <span className="stat-value">{stats.totalAttempts || 0}</span>
             <span className="stat-label">Total Attempts</span>
@@ -50,7 +49,7 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
         </div>
         
         <div className="stat-card admin-stat">
-          <div className="stat-icon">📈</div>
+          <div className="stat-icon"><FaChartLine /></div>
           <div className="stat-info">
             <span className="stat-value">{activeRegularUsers}</span>
             <span className="stat-label">Active Users</span>
@@ -59,7 +58,6 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
       </div>
 
       <div className="dashboard-content">
-        {/* Recent Quizzes */}
         <div className="dashboard-section">
           <div className="section-header">
             <h3>Recent Quizzes</h3>
@@ -98,11 +96,9 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
           </div>
         </div>
 
-        {/* Platform Activity */}
         <div className="dashboard-section">
           <div className="section-header">
             <h3>Recent Platform Activity</h3>
-            {/* FIXED: Link to the correct results page */}
             <Link to="/admin/results" className="btn btn-outline btn-sm">
               View All
             </Link>
@@ -136,7 +132,6 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
           </div>
         </div>
 
-        {/* User Leaderboard - FIXED: Better data handling */}
         <div className="dashboard-section">
           <div className="section-header">
             <h3>Top Performers</h3>
@@ -145,7 +140,6 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
             </Link>
           </div>
           <div className="leaderboard-list">
-            {/* FIXED: Better data checking and fallback */}
             {userLeaderboard && Array.isArray(userLeaderboard) && userLeaderboard.length > 0 ? (
               userLeaderboard.map((user, index) => (
                 <div key={user._id || user.userId || index} className="leaderboard-item">
@@ -161,9 +155,7 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
                 </div>
               ))
             ) : recentResults && recentResults.length > 0 ? (
-              // FALLBACK: Create leaderboard from recent results if userLeaderboard is empty
               (() => {
-                // Group results by user and calculate stats
                 const userStats = {};
                 recentResults.forEach(result => {
                   if (!userStats[result.userId]) {
@@ -182,7 +174,6 @@ const AdminDashboard = ({ stats, recentQuizzes, recentResults, userLeaderboard }
                   }
                 });
 
-                // Convert to array and calculate averages
                 const fallbackLeaderboard = Object.values(userStats).map(user => ({
                   _id: user.userId,
                   username: user.username,

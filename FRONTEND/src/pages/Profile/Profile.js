@@ -10,20 +10,18 @@ import Loading from '../../components/common/Loading/Loading';
 import Modal from '../../components/common/Modal/Modal';
 import ProfilePictureUpload from '../../components/UserProfile/ProfilePictureUpload';
 import ChatPreferences from '../../components/UserProfile/ChatPreferences';
+import { FaCrown, FaUsers, FaEdit, FaCog } from 'react-icons/fa';
 import './Profile.css';
 
 const Profile = () => {
   const { user, updateUser, updatePassword } = useAuth();
   const { isConnected } = useSocket();
 
-  // ✅ FIXED: Use Cloudinary URL directly - no server URL concatenation
   const getProfilePictureUrl = () => {
     if (!user?.profile?.picture) return null;
     
     const pictureUrl = user.profile.picture;
     
-    // ✅ FIX: If it's already a full Cloudinary URL, use it directly
-    // If it's a local path (starts with /uploads), then add server URL
     if (pictureUrl.startsWith('http')) {
       console.log('🔍 Profile Debug - Cloudinary URL:', pictureUrl);
       return pictureUrl;
@@ -50,20 +48,16 @@ const Profile = () => {
   const [message, setMessage] = useState('');
   const [imageError, setImageError] = useState(false);
 
-  // FIXED: Only fetch user stats for regular users, not admins
   const { data: statsData, loading: statsLoading, refetch: refetchStats } = useApi(() =>
     user?.role !== 'admin' ? userService.getUserStats() : Promise.resolve({ data: { overall: {} } })
   );
 
-  // FIXED: Only fetch results for regular users, not admins
   const { data: resultsData, loading: resultsLoading } = useApi(() =>
     user?.role !== 'admin' ? quizService.getResults({ limit: 10 }) : Promise.resolve({ data: [] })
   );
 
-  // FIXED: Use fetched stats with proper fallbacks
   const stats = statsData?.data?.overall || {};
 
-  // If no fetched stats, use user context stats as fallback (only for regular users)
   const finalStats = {
     quizzesTaken: user?.role !== 'admin' ? (stats.totalQuizzesTaken || stats.quizzesTaken || user?.stats?.quizzesTaken || 0) : 0,
     averageScore: user?.role !== 'admin' ? (stats.averageScore || user?.stats?.averageScore || 0) : 0,
@@ -83,7 +77,6 @@ const Profile = () => {
     }
   });
 
-  // Initialize form with user data when user loads
   useEffect(() => {
     if (user) {
       setEditForm({
@@ -114,12 +107,10 @@ const Profile = () => {
       setMessage('Profile updated successfully!');
       setShowEditModal(false);
       
-      // Refresh stats after profile update (only for regular users)
       if (refetchStats && user?.role !== 'admin') {
         refetchStats();
       }
       
-      // Clear message after 3 seconds
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage(error.message || 'Failed to update profile. Please try again.');
@@ -159,7 +150,6 @@ const Profile = () => {
         confirmPassword: ''
       });
       
-      // Clear message after 3 seconds
       setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       setMessage(error.message || 'Failed to change password');
@@ -168,28 +158,24 @@ const Profile = () => {
     }
   };
 
-  // Handle profile picture update
   const handleProfilePictureUpdate = () => {
     setMessage('Profile picture updated successfully!');
     setShowProfilePictureModal(false);
-    setImageError(false); // Reset image error state
+    setImageError(false);
     setTimeout(() => setMessage(''), 3000);
   };
 
-  // Handle chat preferences update
   const handleChatPreferencesUpdate = () => {
     setMessage('Chat preferences updated successfully!');
     setShowChatPreferencesModal(false);
     setTimeout(() => setMessage(''), 3000);
   };
 
-  // Handle image loading error
   const handleImageError = (e) => {
     console.error('❌ Profile image failed to load:', profilePictureUrl);
     setImageError(true);
   };
 
-  // Handle image load success
   const handleImageLoad = () => {
     console.log('✅ Profile image loaded successfully:', profilePictureUrl);
     setImageError(false);
@@ -208,7 +194,6 @@ const Profile = () => {
         <meta name="description" content={user?.role === 'admin' ? 'Admin dashboard for managing King Ice Quiz' : 'View and manage your King Ice Quiz profile'} />
       </Helmet>
 
-      {/* Success/Error Message */}
       {message && (
         <div className={`message ${message.includes('success') ? 'message-success' : 'message-error'}`}>
           {message}
@@ -218,7 +203,6 @@ const Profile = () => {
       <div className="profile-container">
         <div className="profile-header">
           <div className="profile-avatar">
-            {/* Profile picture with upload option */}
             <div 
               className={`avatar-container ${user?.profile?.picture ? 'has-image' : ''}`}
               onClick={() => setShowProfilePictureModal(true)}
@@ -242,7 +226,6 @@ const Profile = () => {
               </div>
             </div>
             
-            {/* Online status indicator */}
             <div className={`online-status ${isConnected ? 'online' : 'offline'}`}>
               {isConnected ? '🟢 Online' : '🔴 Offline'}
             </div>
@@ -272,14 +255,12 @@ const Profile = () => {
               >
                 Change Password
               </button>
-              {/* Chat preferences button */}
               <button
                 onClick={() => setShowChatPreferencesModal(true)}
                 className="btn btn-outline"
               >
                 Chat Settings
               </button>
-              {/* Link to chat */}
               <Link to="/chat" className="btn btn-primary">
                 Open Chat
               </Link>
@@ -287,7 +268,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Show stats only for regular users, not admins */}
         {user?.role !== 'admin' ? (
           statsLoading ? (
             <div className="stats-loading">
@@ -314,22 +294,21 @@ const Profile = () => {
             </div>
           )
         ) : (
-          // Admin-specific stats/message
           <div className="admin-stats-message">
             <div className="admin-message-card">
-              <h3>👑 Administrator Dashboard</h3>
+              <h3><FaCrown /> Administrator Dashboard</h3>
               <p>As an administrator, you manage quizzes, users, and platform settings.</p>
               <div className="admin-quick-stats">
                 <div className="admin-stat">
-                  <span className="admin-stat-icon">👥</span>
+                  <span className="admin-stat-icon"><FaUsers /></span>
                   <span>Manage Users</span>
                 </div>
                 <div className="admin-stat">
-                  <span className="admin-stat-icon">📝</span>
+                  <span className="admin-stat-icon"><FaEdit /></span>
                   <span>Create Quizzes</span>
                 </div>
                 <div className="admin-stat">
-                  <span className="admin-stat-icon">⚙️</span>
+                  <span className="admin-stat-icon"><FaCog /></span>
                   <span>Platform Settings</span>
                 </div>
               </div>
@@ -337,7 +316,6 @@ const Profile = () => {
           </div>
         )}
 
-        {/* Tabs - Updated with proper admin/user differentiation */}
         <div className="profile-tabs">
           <button
             className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
@@ -345,7 +323,6 @@ const Profile = () => {
           >
             Overview
           </button>
-          {/* Only show Quiz History for regular users */}
           {user?.role !== 'admin' && (
             <button
               className={`tab ${activeTab === 'history' ? 'active' : ''}`}
@@ -362,7 +339,6 @@ const Profile = () => {
           </button>
         </div>
 
-        {/* Tab Content - Updated with proper admin/user differentiation */}
         <div className="tab-content">
           {activeTab === 'overview' && (
             <div className="overview-tab">
@@ -401,7 +377,6 @@ const Profile = () => {
                     <label>Member Since</label>
                     <span>{formatDate(user?.createdAt)}</span>
                   </div>
-                  {/* Chat status */}
                   <div className="info-item">
                     <label>Chat Status</label>
                     <span className={`chat-status ${isConnected ? 'connected' : 'disconnected'}`}>
@@ -471,15 +446,15 @@ const Profile = () => {
                   <h3>Quick Management</h3>
                   <div className="admin-actions-grid">
                     <Link to="/admin/quizzes" className="admin-action-btn">
-                      <div className="action-icon">📝</div>
+                      <div className="action-icon"><FaEdit /></div>
                       <span>Manage Quizzes</span>
                     </Link>
                     <Link to="/admin/users" className="admin-action-btn">
-                      <div className="action-icon">👥</div>
+                      <div className="action-icon"><FaUsers /></div>
                       <span>User Management</span>
                     </Link>
                     <Link to="/admin" className="admin-action-btn">
-                      <div className="action-icon">⚙️</div>
+                      <div className="action-icon"><FaCog /></div>
                       <span>Admin Dashboard</span>
                     </Link>
                   </div>

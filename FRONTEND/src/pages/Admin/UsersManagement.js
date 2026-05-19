@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { FaUsers, FaEye } from 'react-icons/fa';
 import './UsersManagement.css';
 
 const UsersManagement = () => {
@@ -9,7 +10,6 @@ const UsersManagement = () => {
   const [message, setMessage] = useState('');
   const { currentUser } = useAuth();
 
-  // ✅ FIXED: Use absolute API URL
   const API_URL = process.env.REACT_APP_API_URL || 'https://king-ice-quiz.onrender.com';
 
   useEffect(() => {
@@ -17,7 +17,6 @@ const UsersManagement = () => {
       try {
         setLoading(true);
         setMessage('');
-        console.log('Fetching users...');
         
         const token = localStorage.getItem('token');
         if (!token) {
@@ -26,28 +25,18 @@ const UsersManagement = () => {
           return;
         }
 
-        // ✅ FIXED: Use absolute URL
         const response = await fetch(`${API_URL}/api/users`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
-        
-        console.log('Response status:', response.status);
-        
+
         if (response.ok) {
           const data = await response.json();
-          console.log('Users data received:', data);
-          
-          // Handle different response structures
           const usersArray = data.data || data.users || data || [];
-          
-          // FILTER OUT ADMIN USERS - Only show regular users
           const regularUsers = usersArray.filter(user => user.role === 'user');
-          console.log('Regular users only:', regularUsers);
-          
-          // Fetch quiz counts for each user - ✅ FIXED: Use absolute URL
+
           const usersWithQuizCounts = await Promise.all(
             regularUsers.map(async (user) => {
               try {
@@ -63,37 +52,25 @@ const UsersManagement = () => {
                   const statsData = await statsResponse.json();
                   quizzesTaken = statsData.count || 0;
                 } else {
-                  // Fallback: count from user stats
                   quizzesTaken = user.stats?.quizzesTaken || user.quizResults?.length || 0;
                 }
                 
-                return {
-                  ...user,
-                  quizzesTaken: quizzesTaken
-                };
+                return { ...user, quizzesTaken };
               } catch (error) {
-                console.error(`Error fetching quiz count for user ${user._id}:`, error);
-                return {
-                  ...user,
-                  quizzesTaken: user.stats?.quizzesTaken || user.quizResults?.length || 0
-                };
+                return { ...user, quizzesTaken: user.stats?.quizzesTaken || user.quizResults?.length || 0 };
               }
             })
           );
           
           setUsers(usersWithQuizCounts);
-          
           if (usersWithQuizCounts.length === 0) {
             setMessage('No users found in the system');
           }
         } else {
-          const errorText = await response.text();
-          console.error('API error:', response.status, errorText);
-          setMessage(`Failed to load users: ${response.status} ${response.statusText}`);
+          setMessage(`Failed to load users: ${response.status}`);
           setUsers([]);
         }
       } catch (error) {
-        console.error('Error fetching users:', error);
         setMessage(`Error: ${error.message}`);
         setUsers([]);
       } finally {
@@ -102,14 +79,13 @@ const UsersManagement = () => {
     };
 
     fetchUsers();
-  }, [currentUser, API_URL]); // ✅ Added API_URL to dependencies
+  }, [currentUser, API_URL]);
 
   const toggleUserStatus = async (userId) => {
     try {
       setMessage('');
       const token = localStorage.getItem('token');
       
-      // ✅ FIXED: Use absolute URL
       const response = await fetch(`${API_URL}/api/users/${userId}/status`, {
         method: 'PUT',
         headers: {
@@ -131,12 +107,8 @@ const UsersManagement = () => {
         ));
         setMessage('User status updated successfully');
         setTimeout(() => setMessage(''), 3000);
-      } else {
-        const errorData = await response.json();
-        setMessage(errorData.message || 'Failed to update user status');
       }
     } catch (error) {
-      console.error('Error updating user status:', error);
       setMessage('Error updating user status');
     }
   };
@@ -150,24 +122,17 @@ const UsersManagement = () => {
       setMessage('');
       const token = localStorage.getItem('token');
       
-      // ✅ FIXED: Use absolute URL
       const response = await fetch(`${API_URL}/api/users/${userId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (response.ok) {
         setUsers(users.filter(user => user._id !== userId));
         setMessage('User deleted successfully');
         setTimeout(() => setMessage(''), 3000);
-      } else {
-        const errorData = await response.json();
-        setMessage(errorData.message || 'Failed to delete user');
       }
     } catch (error) {
-      console.error('Error deleting user:', error);
       setMessage('Error deleting user');
     }
   };
@@ -228,7 +193,6 @@ ${user.profile?.bio ? `Bio: ${user.profile.bio}` : ''}
         </div>
       </div>
 
-      {/* Message Display */}
       {message && (
         <div className={`message ${message.includes('success') || message.includes('found') ? 'message-success' : 'message-error'}`}>
           {message}
@@ -237,7 +201,7 @@ ${user.profile?.bio ? `Bio: ${user.profile.bio}` : ''}
 
       {users.length === 0 && !loading ? (
         <div className="empty-state">
-          <div className="empty-icon">👥</div>
+          <div className="empty-icon"><FaUsers /></div>
           <h3>No Users Found</h3>
           <p>There are no users registered in the system yet.</p>
           <p>Users will appear here once they register accounts.</p>
@@ -299,7 +263,7 @@ ${user.profile?.bio ? `Bio: ${user.profile.bio}` : ''}
                           onClick={() => viewUserDetails(user)}
                           title="View Details"
                         >
-                          👁️
+                          <FaEye />
                         </button>
                         <button 
                           className={user.isActive ? 'btn-warning' : 'btn-success'}

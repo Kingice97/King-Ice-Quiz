@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { useApi } from '../../hooks/useApi';
 import { quizService } from '../../services/quizService';
 import Loading from '../../components/common/Loading/Loading';
+import { FaChartBar } from 'react-icons/fa';
 import './QuizResults.css';
 
 const QuizResults = () => {
@@ -14,15 +15,13 @@ const QuizResults = () => {
     quizService.getQuiz(id)
   );
 
-  // FIXED: Use the correct API endpoint for admin quiz results
-const { data: resultsData, loading: resultsLoading } = useApi(() =>
-  quizService.getQuizResults(id) // Now this will use the correct endpoint
-);
+  const { data: resultsData, loading: resultsLoading } = useApi(() =>
+    quizService.getQuizResults(id)
+  );
 
   const quiz = quizData?.data;
   const results = resultsData?.data || [];
 
-  // Filter results to only show this specific quiz
   const quizResults = results.filter(result => result.quizId?._id === id);
 
   if (quizLoading || resultsLoading) {
@@ -111,7 +110,7 @@ const { data: resultsData, loading: resultsLoading } = useApi(() =>
           </div>
         ) : (
           <div className="empty-state">
-            <div className="empty-icon">📊</div>
+            <div className="empty-icon"><FaChartBar /></div>
             <h3>No Results Yet</h3>
             <p>No users have taken this quiz yet.</p>
             <Link to="/admin" className="btn btn-primary">

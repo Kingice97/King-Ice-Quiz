@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { FaLock, FaShieldAlt, FaSearch, FaGlobe, FaTrash, FaEnvelope, FaCheck } from 'react-icons/fa';
 import './PrivacyPolicy.css';
 
 const PrivacyPolicy = () => {
@@ -19,10 +20,10 @@ const PrivacyPolicy = () => {
 
         <div className="privacy-content">
           <section className="policy-section">
-            <h2>🔒 Message Security & End-to-End Encryption</h2>
+            <h2><FaLock /> Message Security & End-to-End Encryption</h2>
             <div className="security-notice">
               <div className="security-badge">
-                <span className="security-icon">🔒</span>
+                <span className="security-icon"><FaLock /></span>
                 <strong>End-to-End Encrypted</strong>
               </div>
               <p>Your personal messages and calls in King Ice Quiz Chat are secured with end-to-end encryption. This means only you and the person you're communicating with can read or listen to them, and nobody in between, not even King Ice Quiz.</p>
@@ -52,7 +53,7 @@ const PrivacyPolicy = () => {
           </section>
 
           <section className="policy-section">
-            <h2>🛡️ How We Use Your Information</h2>
+            <h2><FaShieldAlt /> How We Use Your Information</h2>
             <ul className="usage-list">
               <li>
                 <strong>Provide Services:</strong> To operate, maintain, and improve King Ice Quiz features
@@ -73,24 +74,24 @@ const PrivacyPolicy = () => {
           </section>
 
           <section className="policy-section">
-            <h2>🔐 Data Security</h2>
+            <h2><FaLock /> Data Security</h2>
             <div className="security-features">
               <div className="security-item">
-                <span className="feature-icon">🔒</span>
+                <span className="feature-icon"><FaLock /></span>
                 <div>
                   <h4>End-to-End Encryption</h4>
                   <p>All private messages are encrypted so only you and the recipient can read them.</p>
                 </div>
               </div>
               <div className="security-item">
-                <span className="feature-icon">🛡️</span>
+                <span className="feature-icon"><FaShieldAlt /></span>
                 <div>
                   <h4>Secure Storage</h4>
                   <p>Your data is stored on secure servers with industry-standard protection measures.</p>
                 </div>
               </div>
               <div className="security-item">
-                <span className="feature-icon">🔍</span>
+                <span className="feature-icon"><FaSearch /></span>
                 <div>
                   <h4>Regular Audits</h4>
                   <p>We regularly review and update our security practices to protect your information.</p>
@@ -111,7 +112,7 @@ const PrivacyPolicy = () => {
           </section>
 
           <section className="policy-section">
-            <h2>🗑️ Your Rights & Choices</h2>
+            <h2><FaTrash /> Your Rights & Choices</h2>
             <div className="rights-grid">
               <div className="right-card">
                 <h3>Access Your Data</h3>
@@ -133,7 +134,7 @@ const PrivacyPolicy = () => {
           </section>
 
           <section className="policy-section">
-            <h2>🌍 International Data Transfers</h2>
+            <h2><FaGlobe /> International Data Transfers</h2>
             <p>Your data may be processed on servers located outside of your country. We ensure appropriate safeguards are in place to protect your data in accordance with this privacy policy.</p>
           </section>
 
@@ -143,7 +144,7 @@ const PrivacyPolicy = () => {
           </section>
 
           <section className="policy-section">
-            <h2>📞 Contact Us</h2>
+            <h2><FaEnvelope /> Contact Us</h2>
             <div className="contact-info">
               <p>If you have any questions about this Privacy Policy or our data practices, please contact us:</p>
               <div className="contact-methods">
@@ -160,9 +161,9 @@ const PrivacyPolicy = () => {
           <div className="policy-footer">
             <p>By using King Ice Quiz, you agree to the collection and use of information in accordance with this policy.</p>
             <div className="trust-badges">
-              <span className="trust-badge">🔒 Secure</span>
-              <span className="trust-badge">🛡️ Protected</span>
-              <span className="trust-badge">✓ Trusted</span>
+              <span className="trust-badge"><FaLock /> Secure</span>
+              <span className="trust-badge"><FaShieldAlt /> Protected</span>
+              <span className="trust-badge"><FaCheck /> Trusted</span>
             </div>
           </div>
         </div>

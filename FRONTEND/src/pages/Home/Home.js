@@ -11,11 +11,12 @@ import './Home.css';
 
 const Home = () => {
   const { isAuthenticated, user, isAdmin } = useAuth();
-const { data: quizzesData, loading: quizzesLoading } = useApi(() => 
-  quizService.getQuizzes({ limit: 6 }),
-  null,
-  [isAuthenticated]
-);
+const { data: quizzesData, loading: quizzesLoading } = useApi(() => {
+  if (isAdmin) {
+    return quizService.getAdminQuizzes({ limit: 100 });
+  }
+  return quizService.getQuizzes({ limit: 6 });
+}, null, [isAdmin, isAuthenticated]);
   const { data: usersData, loading: usersLoading } = useApi(() =>
     userService.getUsers({ limit: 100 })
   );

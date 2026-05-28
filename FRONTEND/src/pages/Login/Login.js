@@ -1,9 +1,9 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import LoginForm from '../../components/auth/LoginForm/LoginForm';
-import { FaChartBar, FaTrophy, FaBullseye, FaSave, FaComments } from 'react-icons/fa';
+import { FaChartBar, FaTrophy, FaBullseye, FaSave, FaComments, FaKey } from 'react-icons/fa';
 import './Login.css';
 
 const Login = () => {
@@ -46,12 +46,15 @@ const Login = () => {
           <div className="login-features">
             <h3>What you'll get:</h3>
             <ul>
+              <li><FaKey /> Join private quizzes with access codes</li>
               <li><FaChartBar /> Track your progress and statistics</li>
               <li><FaTrophy /> Compete on leaderboards</li>
               <li><FaBullseye /> Personalized quiz recommendations</li>
-              <li><FaSave /> Save your quiz results</li>
               <li><FaComments /> Chat with other quiz enthusiasts</li>
             </ul>
+            <p className="login-code-hint">
+              Have a quiz code? <Link to="/join">Join Quiz here</Link>
+            </p>
           </div>
         </div>
       </div>

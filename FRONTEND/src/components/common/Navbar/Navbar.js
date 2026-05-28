@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
-import { FaHome, FaBook, FaComments, FaChartBar, FaCog, FaUser, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaSun, FaMoon, FaBars, FaTimes, FaWhatsapp, FaEnvelope, FaCrown } from 'react-icons/fa';
+import { FaHome, FaBook, FaComments, FaChartBar, FaCog, FaUser, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaSun, FaMoon, FaBars, FaTimes, FaWhatsapp, FaEnvelope, FaCrown, FaKey } from 'react-icons/fa';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -33,6 +33,7 @@ const Navbar = () => {
 
   const navItems = [
     { path: '/', icon: <FaHome />, label: 'Home', show: true },
+    { path: '/join', icon: <FaKey />, label: 'Join Quiz', show: !isAdmin },
     { path: '/quizzes', icon: <FaBook />, label: 'Browse Quizzes', show: !isAdmin },
     { path: '/chat', icon: <FaComments />, label: 'Chat Room', show: true },
     { path: '/dashboard', icon: <FaChartBar />, label: 'My Dashboard', show: isAuthenticated && !isAdmin },
@@ -58,7 +59,6 @@ const Navbar = () => {
       <nav className="navbar mobile-navbar">
         <div className="navbar-container">
           <div className="navbar-header">
-            {/* Logo only - no hamburger */}
             <Link to="/" className="navbar-brand">
               <img src="/brain-icon.png" alt="King Ice Quiz" className="brand-logo" />
               <span className="brand-text">King Ice Quiz</span>
@@ -77,7 +77,6 @@ const Navbar = () => {
 
       {/* ==================== DESKTOP SIDEBAR ==================== */}
       <aside className="sidebar">
-        {/* Brand Section */}
         <div className="sidebar-brand">
           <Link to="/" className="brand-link">
             <img src="/brain-icon.png" alt="King Ice Quiz" className="brand-logo" />
@@ -88,7 +87,6 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Navigation Links */}
         <nav className="sidebar-nav">
           <span className="nav-section-label">MAIN MENU</span>
           {navItems.filter(item => item.show).map(item => (
@@ -96,9 +94,7 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* Sidebar Footer */}
         <div className="sidebar-footer">
-          {/* Theme Toggle */}
           <button className="theme-switch" onClick={toggleTheme}>
             <span className="theme-switch-icon">{isDark ? <FaSun /> : <FaMoon />}</span>
             <span className="theme-switch-text">{isDark ? 'Switch to Light' : 'Switch to Dark'}</span>
@@ -107,7 +103,6 @@ const Navbar = () => {
             </span>
           </button>
 
-          {/* User Section or Auth */}
           {isAuthenticated ? (
             <div className="sidebar-user-section">
               <div className="user-card">
@@ -141,7 +136,6 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Social Links */}
           <div className="sidebar-social">
             <span className="social-heading">Connect With Us</span>
             <div className="social-icons-row">

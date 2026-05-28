@@ -70,14 +70,14 @@ const quizSchema = new mongoose.Schema({
     required: true
   },
   timeLimit: {
-    type: Number, // in minutes
+    type: Number,
     default: 10,
     min: [1, 'Time limit must be at least 1 minute'],
     max: [180, 'Time limit cannot exceed 180 minutes']
   },
   maxAttempts: {
     type: Number,
-    default: 0, // 0 means unlimited attempts
+    default: 0,
     min: 0
   },
   isActive: {
@@ -88,10 +88,23 @@ const quizSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-  // NEW: Quiz expiration settings
+  // NEW: Quiz access code system
+  accessCode: {
+    type: String,
+    unique: true,
+    sparse: true,
+    uppercase: true,
+    trim: true,
+    minlength: [6, 'Access code must be at least 6 characters'],
+    maxlength: [20, 'Access code cannot exceed 20 characters']
+  },
+  requiresCode: {
+    type: Boolean,
+    default: false
+  },
   expiresAt: {
     type: Date,
-    default: null // null means no expiration
+    default: null
   },
   autoExpire: {
     type: Boolean,
@@ -101,7 +114,7 @@ const quizSchema = new mongoose.Schema({
     type: Number,
     default: 24,
     min: 1,
-    max: 720 // 30 days
+    max: 720
   },
   tags: [String],
   passingScore: {
@@ -143,7 +156,6 @@ quizSchema.pre('save', function(next) {
   this.totalPoints = this.questions.reduce((total, question) => total + question.points, 0);
   this.updatedAt = Date.now();
   
-  // Set expiration date if auto-expire is enabled
   if (this.autoExpire && !this.expiresAt) {
     this.expiresAt = new Date(Date.now() + (this.expireAfterHours * 60 * 60 * 1000));
   }
@@ -171,14 +183,14 @@ quizSchema.methods.updateStats = function(newScore, timeTaken) {
 // Method to manually close quiz
 quizSchema.methods.closeQuiz = function() {
   this.isActive = false;
-  this.expiresAt = new Date(); // Set to now to immediately expire
+  this.expiresAt = new Date();
 };
 
 // Method to open quiz
 quizSchema.methods.openQuiz = function() {
   this.isActive = true;
-  this.expiresAt = null; // Remove expiration
-  this.autoExpire = false; // Disable auto-expire
+  this.expiresAt = null;
+  this.autoExpire = false;
 };
 
 // Method to set auto-expiration
@@ -192,8 +204,9 @@ quizSchema.methods.setAutoExpire = function(hours) {
 quizSchema.index({ category: 1, difficulty: 1 });
 quizSchema.index({ createdBy: 1 });
 quizSchema.index({ isActive: 1, isPublic: 1 });
-quizSchema.index({ expiresAt: 1 }); // NEW: Index for expiration
-quizSchema.index({ isActive: 1, expiresAt: 1 }); // NEW: Compound index
+quizSchema.index({ expiresAt: 1 });
+quizSchema.index({ isActive: 1, expiresAt: 1 });
+quizSchema.index({ accessCode: 1 }); // NEW: Index for access code lookup
 
 // Transform output - include virtuals
 quizSchema.set('toJSON', {

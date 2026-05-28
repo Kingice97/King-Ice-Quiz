@@ -1,9 +1,9 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import RegisterForm from '../../components/auth/RegisterForm/RegisterForm';
-import { FaBullseye, FaChartLine, FaTrophy, FaComments } from 'react-icons/fa';
+import { FaBullseye, FaChartLine, FaTrophy, FaComments, FaKey } from 'react-icons/fa';
 import './Register.css';
 
 const Register = () => {
@@ -47,6 +47,11 @@ const Register = () => {
             <h3>With King Ice Quiz you can:</h3>
             <div className="benefits-grid">
               <div className="benefit-card">
+                <div className="benefit-icon"><FaKey /></div>
+                <h4>Join with Code</h4>
+                <p>Enter access codes from teachers to take private quizzes</p>
+              </div>
+              <div className="benefit-card">
                 <div className="benefit-icon"><FaBullseye /></div>
                 <h4>Take Quizzes</h4>
                 <p>Test your knowledge across various categories</p>
@@ -57,16 +62,14 @@ const Register = () => {
                 <p>Monitor your improvement with detailed analytics</p>
               </div>
               <div className="benefit-card">
-                <div className="benefit-icon"><FaTrophy /></div>
-                <h4>Earn Badges</h4>
-                <p>Unlock achievements and climb leaderboards</p>
-              </div>
-              <div className="benefit-card">
                 <div className="benefit-icon"><FaComments /></div>
                 <h4>Real-time Chat</h4>
                 <p>Connect with other learners and discuss quizzes</p>
               </div>
             </div>
+            <p className="register-code-hint">
+              Already have a quiz code? <Link to="/join">Join Quiz here</Link>
+            </p>
           </div>
         </div>
       </div>

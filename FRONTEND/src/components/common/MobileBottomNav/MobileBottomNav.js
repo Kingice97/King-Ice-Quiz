@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { FaHome, FaBook, FaComments, FaUser, FaEllipsisH, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaChartBar, FaCog, FaWhatsapp, FaEnvelope, FaCrown, FaTimes } from 'react-icons/fa';
+import { FaHome, FaBook, FaComments, FaUser, FaEllipsisH, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaChartBar, FaCog, FaWhatsapp, FaEnvelope, FaCrown, FaTimes, FaKey } from 'react-icons/fa';
 import './MobileBottomNav.css';
 
 const MobileBottomNav = () => {
@@ -43,6 +43,7 @@ const MobileBottomNav = () => {
 
   const tabs = [
     { path: '/', icon: <FaHome />, label: 'Home', show: true },
+    { path: '/join', icon: <FaKey />, label: 'Join', show: !isAdmin },
     { path: '/quizzes', icon: <FaBook />, label: 'Quizzes', show: !isAdmin },
     { path: '/chat', icon: <FaComments />, label: 'Chat', show: true, badge: true },
     { 

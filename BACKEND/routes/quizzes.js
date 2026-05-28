@@ -31,4 +31,10 @@ router.put('/:id/expire', authMiddleware.authorize('admin'), quizController.setQ
 router.get('/admin/my-quizzes', authMiddleware.authorize('admin'), quizController.getAdminQuizzes);
 router.get('/admin/my-results', authMiddleware.authorize('admin'), quizController.getAdminResults);
 
+// Access code routes
+router.post('/join-by-code', authMiddleware.protect, quizController.joinByCode);
+router.post('/:id/generate-code', authMiddleware.authorize('admin'), quizController.generateAccessCode);
+router.delete('/:id/access-code', authMiddleware.authorize('admin'), quizController.removeAccessCode);
+router.get('/code/:code/results', authMiddleware.authorize('admin'), quizController.getResultsByCode);
+
 module.exports = router;

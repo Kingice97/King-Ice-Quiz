@@ -1,10 +1,21 @@
 import api from './api';
 
 export const quizService = {
-  getQuizzes: async (params = {}) => {
-    const response = await api.get('/quizzes', { params });
-    return response.data;
-  },
+ getQuizzes: async (params = {}) => {
+  // Build query string manually to ensure all params are sent
+  const queryParts = [];
+  if (params.category) queryParts.push(`category=${encodeURIComponent(params.category)}`);
+  if (params.difficulty) queryParts.push(`difficulty=${encodeURIComponent(params.difficulty)}`);
+  if (params.search) queryParts.push(`search=${encodeURIComponent(params.search)}`);
+  if (params.sortBy) queryParts.push(`sortBy=${encodeURIComponent(params.sortBy)}`);
+  if (params.sortOrder) queryParts.push(`sortOrder=${encodeURIComponent(params.sortOrder)}`);
+  if (params.page) queryParts.push(`page=${params.page}`);
+  if (params.limit) queryParts.push(`limit=${params.limit}`);
+  
+  const queryString = queryParts.length > 0 ? `?${queryParts.join('&')}` : '';
+  const response = await api.get(`/quizzes${queryString}`);
+  return response.data;
+},
 
   getQuiz: async (id) => {
     const response = await api.get(`/quizzes/${id}`);

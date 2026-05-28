@@ -6,6 +6,7 @@ import { quizService } from '../../services/quizService';
 import Loading from '../../components/common/Loading/Loading';
 import Modal from '../../components/common/Modal/Modal';
 import QuizForm from '../../components/admin/QuizForm/QuizForm';
+import { FaKey, FaCopy, FaCheck } from 'react-icons/fa';
 import './QuizzesManagement.css';
 
 const QuizzesManagement = () => {
@@ -13,14 +14,15 @@ const QuizzesManagement = () => {
   const [editingQuiz, setEditingQuiz] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [copiedCode, setCopiedCode] = useState(null);
+  const [generatingCode, setGeneratingCode] = useState(null);
 
   const { data: quizzesData, loading: quizzesLoading, setData: setQuizzesData } = useApi(() =>
-    quizService.getQuizzes({ limit: 100 })
-  );
+  quizService.getAdminQuizzes({ limit: 100 })
+);
 
   const quizzes = quizzesData?.data || [];
 
-  // Filter quizzes based on search and category
   const filteredQuizzes = quizzes.filter(quiz => {
     const matchesSearch = quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          quiz.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -28,8 +30,80 @@ const QuizzesManagement = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Get unique categories
   const categories = [...new Set(quizzes.map(quiz => quiz.category))];
+
+  // NEW: Generate access code for a quiz
+  const handleGenerateCode = async (quizId) => {
+    setGeneratingCode(quizId);
+    try {
+      const token = localStorage.getItem('token');
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      
+      const response = await fetch(`${API_URL}/api/quizzes/${quizId}/generate-code`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Update the quiz in the list with the new code
+        setQuizzesData(prev => ({
+          ...prev,
+          data: prev.data.map(quiz => 
+            quiz._id === quizId ? { ...quiz, accessCode: data.data.accessCode, requiresCode: true } : quiz
+          )
+        }));
+      } else {
+        alert(data.message || 'Failed to generate code');
+      }
+    } catch (error) {
+      console.error('Failed to generate code:', error);
+      alert('Failed to generate code. Please try again.');
+    } finally {
+      setGeneratingCode(null);
+    }
+  };
+
+  // NEW: Copy code to clipboard
+  const handleCopyCode = (code, quizId) => {
+    navigator.clipboard.writeText(code).then(() => {
+      setCopiedCode(quizId);
+      setTimeout(() => setCopiedCode(null), 2000);
+    });
+  };
+
+  // NEW: Remove access code
+  const handleRemoveCode = async (quizId) => {
+    if (!window.confirm('Remove the access code? Users will no longer be able to join with the current code.')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      
+      const response = await fetch(`${API_URL}/api/quizzes/${quizId}/access-code`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setQuizzesData(prev => ({
+          ...prev,
+          data: prev.data.map(quiz => 
+            quiz._id === quizId ? { ...quiz, accessCode: null, requiresCode: false } : quiz
+          )
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to remove code:', error);
+      alert('Failed to remove code. Please try again.');
+    }
+  };
 
   const handleCreateQuiz = async (quizData) => {
     try {
@@ -89,40 +163,6 @@ const QuizzesManagement = () => {
     } catch (error) {
       console.error('Failed to update quiz status:', error);
       alert('Failed to update quiz status. Please try again.');
-    }
-  };
-
-  // NEW: Temporary fix for admin functions until backend is ready
-  const handleSetExpiration = async (quizId, hours) => {
-    try {
-      await quizService.setQuizExpiration(quizId, hours);
-      alert('Expiration set successfully!');
-    } catch (error) {
-      console.error('Failed to set expiration:', error);
-      // Temporary: Show success anyway for demo
-      alert('Expiration set successfully! (Demo mode)');
-    }
-  };
-
-  const handleOpenQuiz = async (quizId) => {
-    try {
-      await quizService.openQuiz(quizId);
-      alert('Quiz opened successfully!');
-    } catch (error) {
-      console.error('Failed to open quiz:', error);
-      // Temporary: Show success anyway for demo
-      alert('Quiz opened successfully! (Demo mode)');
-    }
-  };
-
-  const handleCloseQuiz = async (quizId) => {
-    try {
-      await quizService.closeQuiz(quizId);
-      alert('Quiz closed successfully!');
-    } catch (error) {
-      console.error('Failed to close quiz:', error);
-      // Temporary: Show success anyway for demo
-      alert('Quiz closed successfully! (Demo mode)');
     }
   };
 
@@ -205,10 +245,43 @@ const QuizzesManagement = () => {
                       <span>{quiz.questions?.length || 0} questions</span>
                     </div>
 
+                    {/* NEW: Access Code Section */}
+                    <div className="quiz-access-code">
+                      {quiz.accessCode ? (
+                        <div className="code-display">
+                          <span className="code-label"><FaKey /> Access Code:</span>
+                          <div className="code-value-row">
+                            <code className="code-text">{quiz.accessCode}</code>
+                            <button
+                              className="btn-copy"
+                              onClick={() => handleCopyCode(quiz.accessCode, quiz._id)}
+                              title="Copy code"
+                            >
+                              {copiedCode === quiz._id ? <FaCheck /> : <FaCopy />}
+                            </button>
+                          </div>
+                          <button
+                            className="btn-remove-code"
+                            onClick={() => handleRemoveCode(quiz._id)}
+                          >
+                            Remove Code
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          className="btn-generate-code"
+                          onClick={() => handleGenerateCode(quiz._id)}
+                          disabled={generatingCode === quiz._id}
+                        >
+                          <FaKey />
+                          {generatingCode === quiz._id ? 'Generating...' : 'Generate Access Code'}
+                        </button>
+                      )}
+                    </div>
+
                     <div className="quiz-stats">
                       <span>{quiz.stats?.timesTaken || 0} attempts</span>
                       <span>{Math.round(quiz.stats?.averageScore || 0)}% avg</span>
-                      <span>{Math.round(quiz.stats?.completionRate || 0)}% completion</span>
                     </div>
 
                     <div className="quiz-actions">
@@ -224,42 +297,6 @@ const QuizzesManagement = () => {
                       >
                         {quiz.isActive ? 'Deactivate' : 'Activate'}
                       </button>
-                      
-                      {/* NEW: Admin quick actions */}
-                      <button
-                        onClick={() => handleOpenQuiz(quiz._id)}
-                        className="btn btn-outline btn-sm"
-                        title="Open Quiz"
-                      >
-                        Open
-                      </button>
-                      <button
-                        onClick={() => handleCloseQuiz(quiz._id)}
-                        className="btn btn-outline btn-sm"
-                        title="Close Quiz"
-                      >
-                        Close
-                      </button>
-                      <button
-                        onClick={() => {
-                          const hours = prompt('Enter expiration hours:');
-                          if (hours && !isNaN(hours)) {
-                            handleSetExpiration(quiz._id, parseInt(hours));
-                          }
-                        }}
-                        className="btn btn-outline btn-sm"
-                        title="Set Expiration"
-                      >
-                        Expire
-                      </button>
-                      
-                      <Link
-                        to={`/admin/quizzes`} // Changed from non-existent results page
-                        className="btn btn-outline btn-sm"
-                        title="View Quiz Details"
-                      >
-                        View
-                      </Link>
                       <button
                         onClick={() => handleDeleteQuiz(quiz._id)}
                         className="btn btn-danger btn-sm"

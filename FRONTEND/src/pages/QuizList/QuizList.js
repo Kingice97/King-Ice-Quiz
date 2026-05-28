@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useApi } from '../../hooks/useApi';
 import { quizService } from '../../services/quizService';
 import { QUIZ_CATEGORIES, QUIZ_DIFFICULTY } from '../../utils/constants';
 import QuizCard from '../../components/quiz/QuizCard/QuizCard';
 import Loading from '../../components/common/Loading/Loading';
+import { FaKey } from 'react-icons/fa';
 import './QuizList.css';
 
 const QuizList = () => {
@@ -17,23 +18,23 @@ const QuizList = () => {
   });
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
-  const [searchInput, setSearchInput] = useState(filters.search);
+  const [searchInput, setSearchInput] = useState(filters.search || '');
 
-  const { data: quizzesData, loading, error, setData } = useApi(() =>
-    quizService.getQuizzes({
-      ...filters,
-      sortBy,
-      sortOrder,
-      page: 1,
-      limit: 50
-    })
-  );
+const { data: quizzesData, loading, error } = useApi(() =>
+  quizService.getQuizzes({
+    ...filters,
+    sortBy,
+    sortOrder,
+    page: 1,
+    limit: 50
+  }),
+  null,
+  [filters, sortBy, sortOrder]
+);
 
   const quizzes = quizzesData?.data || [];
-  const pagination = quizzesData?.pagination;
 
   useEffect(() => {
-    // Update URL with current filters
     const params = new URLSearchParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value) params.set(key, value);
@@ -48,20 +49,20 @@ const QuizList = () => {
     }));
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const search = formData.get('search');
-    handleFilterChange('search', search);
-  };
+const handleSearch = (e) => {
+  e.preventDefault();
+  const searchValue = searchInput.trim();
+  if (searchValue) {
+    setFilters(prev => ({
+      ...prev,
+      search: searchValue
+    }));
+  }
+};
 
-  const handleSearchInputChange = (e) => {
-    setSearchInput(e.target.value);
-    // If search input is cleared, immediately clear the search filter
-    if (!e.target.value.trim()) {
-      handleFilterChange('search', '');
-    }
-  };
+const handleSearchInputChange = (e) => {
+  setSearchInput(e.target.value);
+};
 
   const clearFilters = () => {
     setFilters({
@@ -80,30 +81,30 @@ const QuizList = () => {
     <div className="quiz-list-page">
       <Helmet>
         <title>Quizzes - King Ice Quiz</title>
-        <meta name="description" content="Browse all available quizzes on King Ice Quiz" />
+        <meta name="description" content="Browse all <h2>Available Public Quizzes</h2> on King Ice Quiz" />
       </Helmet>
 
       <div className="container">
         <div className="page-header">
-          <h1>Available Quizzes</h1>
-          <p>Test your knowledge with our curated collection of quizzes</p>
+          <h1><h2>Available Public Quizzes</h2></h1>
+          <p>Browse available public quizzes</p>
         </div>
 
         {/* Filters and Search */}
         <div className="filters-section">
-          <form onSubmit={handleSearch} className="search-box">
-            <input
-              type="text"
-              name="search"
-              placeholder="Search quizzes by title, description, or category..."
-              value={searchInput}
-              onChange={handleSearchInputChange}
-              className="search-input"
-            />
-            <button type="submit" className="btn btn-primary">
-              Search
-            </button>
-          </form>
+       <form onSubmit={handleSearch} className="search-box">
+  <input
+    type="text"
+    name="search"
+    placeholder="Search quizzes by title, description, or category..."
+    value={searchInput}
+    onChange={handleSearchInputChange}
+    className="search-input"
+  />
+  <button type="submit" className="btn btn-primary">
+    Search
+  </button>
+</form>
 
           <div className="filters-row">
             <div className="filter-group">
@@ -215,16 +216,17 @@ const QuizList = () => {
                 <p>
                   {hasActiveFilters 
                     ? "Try adjusting your search criteria or browse all categories." 
-                    : "No quizzes are available at the moment. Please check back later."
+                    : "No public quizzes available yet. Have a code from your teacher?"
                   }
                 </p>
-                {hasActiveFilters && (
-                  <button
-                    onClick={clearFilters}
-                    className="btn btn-primary"
-                  >
+                {hasActiveFilters ? (
+                  <button onClick={clearFilters} className="btn btn-primary">
                     Clear Filters
                   </button>
+                ) : (
+                  <Link to="/join" className="btn btn-primary">
+                    <FaKey /> Join with Code
+                  </Link>
                 )}
               </div>
             )}

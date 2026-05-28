@@ -24,6 +24,7 @@ import QuizResults from './pages/QuizResults/QuizResults';
 import NotFound from './pages/NotFound/NotFound';
 import UserProfile from './pages/UserProfile/UserProfile';
 import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy';
+import JoinQuiz from './pages/JoinQuiz/JoinQuiz';
 
 // Chat Pages
 import Chat from './pages/Chat/Chat';
@@ -309,6 +310,7 @@ function App() {
                 <Route path="/login" element={<Layout><Login /></Layout>} />
                 <Route path="/register" element={<Layout><Register /></Layout>} />
                 <Route path="/quizzes" element={<Layout><QuizList /></Layout>} />
+                <Route path="/join" element={<Layout><JoinQuiz /></Layout>} />
                 
                 <Route 
                   path="/quiz/:id" 

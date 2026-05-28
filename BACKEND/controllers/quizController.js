@@ -32,6 +32,17 @@ exports.getQuizzes = async (req, res, next) => {
       ]
     });
 
+    // NEW: Hide code-protected quizzes from public listing
+    // Users must use the /join-by-code endpoint to access these
+    filterConditions.push({
+      $or: [
+        { requiresCode: { $ne: true } },
+        { requiresCode: { $exists: false } },
+        { accessCode: null },
+        { accessCode: { $exists: false } }
+      ]
+    });
+
     // Add category filter if provided
     if (category && category.trim()) {
       filterConditions.push({ category: new RegExp(category, 'i') });
@@ -68,7 +79,7 @@ exports.getQuizzes = async (req, res, next) => {
     const skip = (pageNum - 1) * limitNum;
 
     const quizzes = await Quiz.find(filter)
-      .select('title description category difficulty timeLimit questions stats totalPoints createdBy createdAt expiresAt autoExpire')
+      .select('title description category difficulty timeLimit questions stats totalPoints createdBy createdAt expiresAt autoExpire requiresCode')
       .populate('createdBy', 'username profile')
       .sort(sort)
       .skip(skip)
@@ -478,7 +489,7 @@ exports.getAdminQuizzes = async (req, res, next) => {
     const skip = (pageNum - 1) * limitNum;
 
     const quizzes = await Quiz.find(filter)
-      .select('title description category difficulty timeLimit questions stats totalPoints createdBy createdAt expiresAt autoExpire isActive isPublic')
+      .select('title description category difficulty timeLimit questions stats totalPoints createdBy createdAt expiresAt autoExpire isActive isPublic accessCode requiresCode')
       .populate('createdBy', 'username profile')
       .sort(sort)
       .skip(skip)
@@ -665,6 +676,215 @@ exports.setQuizExpiration = async (req, res, next) => {
     res.json({
       success: true,
       message: `Quiz will expire in ${hours} hours`,
+      data: quiz
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Generate unique access code
+// @route   POST /api/quizzes/:id/generate-code
+// @access  Private/Admin
+exports.generateAccessCode = async (req, res, next) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+
+    if (!quiz) {
+      return res.status(404).json({
+        success: false,
+        message: 'Quiz not found'
+      });
+    }
+
+    // Check if user owns the quiz or is admin
+    if (quiz.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to manage this quiz'
+      });
+    }
+
+    // If code already exists, just return it - don't generate a new one
+    if (quiz.accessCode) {
+      return res.json({
+        success: true,
+        message: 'Access code already exists',
+        data: {
+          accessCode: quiz.accessCode,
+          quizId: quiz._id,
+          quizTitle: quiz.title
+        }
+      });
+    }
+
+    // Generate unique 8-character alphanumeric code
+    const generateCode = () => {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No confusing 0/O, 1/I
+      let code = '';
+      for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    };
+
+    let code;
+    let isUnique = false;
+    let attempts = 0;
+
+    // Ensure unique code
+    while (!isUnique && attempts < 10) {
+      code = generateCode();
+      const existing = await Quiz.findOne({ accessCode: code });
+      if (!existing) {
+        isUnique = true;
+      }
+      attempts++;
+    }
+
+    if (!isUnique) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to generate unique code. Please try again.'
+      });
+    }
+
+    quiz.accessCode = code;
+    quiz.requiresCode = true;
+    await quiz.save();
+
+    res.json({
+      success: true,
+      message: 'Access code generated successfully',
+      data: {
+        accessCode: code,
+        quizId: quiz._id,
+        quizTitle: quiz.title
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Join quiz by access code
+// @route   POST /api/quizzes/join-by-code
+// @access  Private
+exports.joinByCode = async (req, res, next) => {
+  try {
+    const { code } = req.body;
+
+    if (!code || !code.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide an access code'
+      });
+    }
+
+    const cleanCode = code.trim().toUpperCase();
+
+    // Find quiz by access code
+    const quiz = await Quiz.findOne({ 
+      accessCode: cleanCode,
+      isActive: true,
+      $or: [
+        { expiresAt: null },
+        { expiresAt: { $gt: new Date() } }
+      ]
+    }).select('title description category difficulty timeLimit questions stats totalPoints createdAt expiresAt accessCode');
+
+    if (!quiz) {
+      return res.status(404).json({
+        success: false,
+        message: 'Invalid or expired access code. Please check the code and try again.'
+      });
+    }
+
+    // Don't send correct answers
+    const quizObj = quiz.toObject();
+    quizObj.questions = quizObj.questions.map(q => {
+      const { correctAnswer, ...questionWithoutAnswer } = q;
+      return questionWithoutAnswer;
+    });
+
+    res.json({
+      success: true,
+      message: 'Quiz found!',
+      data: quizObj
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get results by access code (for admin tracking)
+// @route   GET /api/quizzes/code/:code/results
+// @access  Private/Admin
+exports.getResultsByCode = async (req, res, next) => {
+  try {
+    const { code } = req.params;
+
+    const quiz = await Quiz.findOne({ accessCode: code.toUpperCase() });
+
+    if (!quiz) {
+      return res.status(404).json({
+        success: false,
+        message: 'No quiz found with this access code'
+      });
+    }
+
+    // Check if admin owns this quiz
+    if (quiz.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to view these results'
+      });
+    }
+
+    const results = await Result.find({ quizId: quiz._id })
+      .populate('userId', 'username profile email')
+      .sort({ percentage: -1, timeTaken: 1 });
+
+    res.json({
+      success: true,
+      code: code,
+      quizTitle: quiz.title,
+      count: results.length,
+      data: results
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Remove access code from quiz
+// @route   DELETE /api/quizzes/:id/access-code
+// @access  Private/Admin
+exports.removeAccessCode = async (req, res, next) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+
+    if (!quiz) {
+      return res.status(404).json({
+        success: false,
+        message: 'Quiz not found'
+      });
+    }
+
+    if (quiz.createdBy.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to manage this quiz'
+      });
+    }
+
+    quiz.accessCode = undefined;
+    quiz.requiresCode = false;
+    await quiz.save();
+
+    res.json({
+      success: true,
+      message: 'Access code removed successfully',
       data: quiz
     });
   } catch (error) {

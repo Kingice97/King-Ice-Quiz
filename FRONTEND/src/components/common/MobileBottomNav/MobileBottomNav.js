@@ -43,8 +43,8 @@ const MobileBottomNav = () => {
 
   const tabs = [
     { path: '/', icon: <FaHome />, label: 'Home', show: true },
-    { path: '/join', icon: <FaKey />, label: 'Join', show: !isAdmin },
-    { path: '/quizzes', icon: <FaBook />, label: 'Quizzes', show: !isAdmin },
+    { path: '/join', icon: <FaKey />, label: 'Join', show: !isAdmin && !user?.isSuperAdmin },
+    { path: '/quizzes', icon: <FaBook />, label: 'Quizzes', show: !isAdmin && !user?.isSuperAdmin },
     { path: '/chat', icon: <FaComments />, label: 'Chat', show: true, badge: true },
     { 
       path: '/profile', 
@@ -119,8 +119,9 @@ const MobileBottomNav = () => {
               <div className="more-user-info">
                 <span className="more-user-name">{user?.username}</span>
                 <span className="more-user-role">
-                  {isAdmin && <><FaCrown /> Admin</>}
-                  {!isAdmin && 'Learner'}
+                  {user?.isSuperAdmin && <><FaCrown /> Super Admin</>}
+                  {isAdmin && !user?.isSuperAdmin && <>Admin</>}
+                  {!isAdmin && !user?.isSuperAdmin && 'Learner'}
                 </span>
               </div>
             </div>
@@ -137,14 +138,19 @@ const MobileBottomNav = () => {
 
           {/* Quick Links */}
           <div className="more-links">
-            {isAuthenticated && !isAdmin && (
-              <button className="more-link" onClick={() => { navigate('/dashboard'); setShowMorePanel(false); }}>
-                <FaChartBar /> Dashboard
+            {isAuthenticated && user?.isSuperAdmin && (
+              <button className="more-link" onClick={() => { navigate('/super-admin'); setShowMorePanel(false); }}>
+                <FaCrown /> Command Center
               </button>
             )}
-            {isAuthenticated && isAdmin && (
+            {isAuthenticated && isAdmin && !user?.isSuperAdmin && (
               <button className="more-link" onClick={() => { navigate('/admin'); setShowMorePanel(false); }}>
                 <FaCog /> Admin Panel
+              </button>
+            )}
+            {isAuthenticated && !isAdmin && !user?.isSuperAdmin && (
+              <button className="more-link" onClick={() => { navigate('/dashboard'); setShowMorePanel(false); }}>
+                <FaChartBar /> Dashboard
               </button>
             )}
             {isAuthenticated && (

@@ -146,5 +146,15 @@ export const quizService = {
       params: { limit }
     });
     return response.data;
-  }
+  },
+
+getSuperAdminQuizzes: async () => {
+  const response = await api.get('/super-admin/quizzes');
+  return response.data;
+},
+
+getSuperAdminResults: async () => {
+  const response = await api.get('/super-admin/results');
+  return response.data;
+}
 };

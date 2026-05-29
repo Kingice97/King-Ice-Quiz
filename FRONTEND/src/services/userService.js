@@ -392,6 +392,15 @@ getUserProfile: async (username) => {
       console.error('❌ Failed to report user:', error);
       throw error;
     }
-  }
+  },
 
+  getSuperAdminDashboard: async () => {
+  const response = await api.get('/super-admin/dashboard');
+  return response.data;
+},
+
+getSuperAdminUsers: async () => {
+  const response = await api.get('/super-admin/users');
+  return response.data;
+}
 };

@@ -25,6 +25,7 @@ import NotFound from './pages/NotFound/NotFound';
 import UserProfile from './pages/UserProfile/UserProfile';
 import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy';
 import JoinQuiz from './pages/JoinQuiz/JoinQuiz';
+import SuperAdmin from './pages/SuperAdmin/SuperAdmin';
 
 // Chat Pages
 import Chat from './pages/Chat/Chat';
@@ -369,6 +370,15 @@ function App() {
                     </ProtectedRoute>
                   } 
                 />
+
+                <Route 
+  path="/super-admin" 
+  element={
+    <ProtectedRoute>
+      <Layout><SuperAdmin /></Layout>
+    </ProtectedRoute>
+  } 
+/>
                 
                 <Route 
                   path="/admin" 

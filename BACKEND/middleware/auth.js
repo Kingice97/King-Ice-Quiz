@@ -5,12 +5,10 @@ exports.protect = async (req, res, next) => {
   try {
     let token;
 
-    // Get token from header
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
 
-    // Check if token exists
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -19,12 +17,10 @@ exports.protect = async (req, res, next) => {
     }
 
     try {
-      // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       
       console.log('🔐 Token decoded:', { id: decoded.id });
       
-      // Get user from the token
       const user = await User.findById(decoded.id);
       
       if (!user) {
@@ -35,13 +31,13 @@ exports.protect = async (req, res, next) => {
         });
       }
 
-      // ✅ FIXED: Set req.user properly
       req.user = {
         id: user._id,
         _id: user._id,
         username: user.username,
         email: user.email,
         role: user.role,
+        isSuperAdmin: user.isSuperAdmin || false,
         profile: user.profile
       };
 
@@ -63,7 +59,6 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-// Grant access to specific roles
 exports.authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
@@ -71,6 +66,11 @@ exports.authorize = (...roles) => {
         success: false,
         message: 'Not authorized to access this route'
       });
+    }
+    
+    // Super admin can access everything
+    if (req.user.isSuperAdmin) {
+      return next();
     }
     
     if (!roles.includes(req.user.role)) {

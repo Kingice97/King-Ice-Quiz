@@ -17,6 +17,7 @@ const resultRoutes = require('./routes/results');
 const userRoutes = require('./routes/users');
 const uploadRoutes = require('./routes/upload');
 const chatRoutes = require('./routes/chat');
+const superAdminRoutes = require('./routes/superAdmin');
 
 // Import middleware
 const errorHandler = require('./middleware/error');
@@ -269,6 +270,7 @@ app.use('/api/results', resultRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/super-admin', superAdminRoutes);
 
 // Conversations route
 app.get('/api/conversations', auth.protect, async (req, res) => {

@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: [3, 'Username must be at least 3 characters long'],
     maxlength: [30, 'Username cannot exceed 30 characters'],
-    match: [/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers and underscores'],
+    match: [/^[a-zA-Z0-9_ ]+$/, 'Username can only contain letters, numbers, underscores and spaces'],
     index: true
   },
   email: {
@@ -30,11 +30,15 @@ const userSchema = new mongoose.Schema({
     minlength: [6, 'Password must be at least 6 characters long'],
     select: false
   },
-  role: {
+ role: {
     type: String,
-    enum: ['user', 'admin'],
+    enum: ['user', 'admin', 'superadmin'],
     default: 'user',
     index: true
+  },
+  isSuperAdmin: {
+    type: Boolean,
+    default: false
   },
   profile: {
     firstName: String,

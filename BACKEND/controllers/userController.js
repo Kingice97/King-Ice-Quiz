@@ -935,8 +935,6 @@ exports.reportUser = async (req, res, next) => {
     const { reason } = req.body;
     const reporter = req.user;
 
-    console.log(`🚨 Reporting user: ${id}, reason: ${reason}`);
-
     const reportedUser = await User.findById(id);
     if (!reportedUser) {
       return res.status(404).json({
@@ -945,7 +943,6 @@ exports.reportUser = async (req, res, next) => {
       });
     }
 
-    // Prevent reporting yourself
     if (id === reporter._id.toString()) {
       return res.status(400).json({
         success: false,
@@ -953,23 +950,11 @@ exports.reportUser = async (req, res, next) => {
       });
     }
 
-    // Log the report (since Report model might not exist)
     console.log('🚨 USER REPORT RECEIVED:');
     console.log('📧 To: olubiyiisaacanu@gmail.com');
-    console.log('👤 Reported User:', reportedUser.username, `(${reportedUser.email})`);
-    console.log('👤 Reporter:', reporter.username, `(${reporter.email})`);
+    console.log('👤 Reported User:', reportedUser.username);
+    console.log('👤 Reporter:', reporter.username);
     console.log('📝 Reason:', reason);
-    console.log('📅 Date:', new Date().toLocaleString());
-
-    // For now, just log the report and return success
-    // TODO: Create Report model and save reports to database
-    // const report = new Report({
-    //   reporter: reporter._id,
-    //   reportedUser: id,
-    //   reason,
-    //   status: 'pending'
-    // });
-    // await report.save();
 
     res.json({
       success: true,
@@ -981,5 +966,139 @@ exports.reportUser = async (req, res, next) => {
       success: false,
       message: 'Failed to report user: ' + error.message
     });
+  }
+};
+
+// ========== SUPER ADMIN FUNCTIONS ==========
+
+// @desc    Get all platform data for super admin
+// @route   GET /api/super-admin/dashboard
+// @access  Private/SuperAdmin
+exports.getSuperAdminDashboard = async (req, res, next) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalAdmins = await User.countDocuments({ role: 'admin' });
+    const totalRegularUsers = await User.countDocuments({ role: 'user' });
+    const totalQuizzes = await Quiz.countDocuments();
+    const totalPublicQuizzes = await Quiz.countDocuments({ requiresCode: { $ne: true } });
+    const totalPrivateQuizzes = await Quiz.countDocuments({ requiresCode: true });
+    const totalResults = await Result.countDocuments();
+    
+    const admins = await User.find({ role: 'admin', isSuperAdmin: { $ne: true } })
+      .select('username email profile createdAt stats isActive lastLogin');
+    
+    const adminsWithStats = await Promise.all(admins.map(async (admin) => {
+      const quizCount = await Quiz.countDocuments({ createdBy: admin._id });
+      const privateQuizCount = await Quiz.countDocuments({ createdBy: admin._id, requiresCode: true });
+      const adminQuizIds = await Quiz.find({ createdBy: admin._id }).select('_id');
+      const resultCount = await Result.countDocuments({ 
+        quizId: { $in: adminQuizIds.map(q => q._id) }
+      });
+      return {
+        ...admin.toObject(),
+        quizCount,
+        privateQuizCount,
+        resultCount
+      };
+    }));
+
+    const recentUsers = await User.find()
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .select('username email role createdAt');
+    
+    const recentResults = await Result.find()
+      .populate('userId', 'username')
+      .populate('quizId', 'title createdBy')
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    res.json({
+      success: true,
+      data: {
+        stats: {
+          totalUsers,
+          totalAdmins,
+          totalRegularUsers,
+          totalQuizzes,
+          totalPublicQuizzes,
+          totalPrivateQuizzes,
+          totalResults
+        },
+        admins: adminsWithStats,
+        recentUsers,
+        recentResults
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all quizzes (super admin sees everything)
+// @route   GET /api/super-admin/quizzes
+// @access  Private/SuperAdmin
+exports.getSuperAdminQuizzes = async (req, res, next) => {
+  try {
+    const quizzes = await Quiz.find()
+      .populate('createdBy', 'username email')
+      .sort({ createdAt: -1 })
+      .limit(200);
+
+    res.json({
+      success: true,
+      count: quizzes.length,
+      data: quizzes
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all results (super admin sees everything)
+// @route   GET /api/super-admin/results
+// @access  Private/SuperAdmin
+exports.getSuperAdminResults = async (req, res, next) => {
+  try {
+    const results = await Result.find()
+      .populate('userId', 'username email')
+      .populate({
+        path: 'quizId',
+        select: 'title createdBy',
+        populate: {
+          path: 'createdBy',
+          select: 'username'
+        }
+      })
+      .sort({ createdAt: -1 })
+      .limit(500);
+
+    res.json({
+      success: true,
+      count: results.length,
+      data: results
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all users (super admin sees everything)
+// @route   GET /api/super-admin/users
+// @access  Private/SuperAdmin
+exports.getSuperAdminUsers = async (req, res, next) => {
+  try {
+    const users = await User.find()
+      .select('-password')
+      .sort({ createdAt: -1 })
+      .limit(500);
+
+    res.json({
+      success: true,
+      count: users.length,
+      data: users
+    });
+  } catch (error) {
+    next(error);
   }
 };

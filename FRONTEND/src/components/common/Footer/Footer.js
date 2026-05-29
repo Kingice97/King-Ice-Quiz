@@ -4,7 +4,8 @@ import { useAuth } from '../../../context/AuthContext';
 import './Footer.css';
 
 const Footer = () => {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, user } = useAuth();
+  const isSuperAdmin = user?.isSuperAdmin || false;
   const currentYear = new Date().getFullYear();
 
   const contactInfo = {
@@ -24,9 +25,11 @@ const Footer = () => {
               King Ice Quiz
             </div>
             <p className="footer-description">
-              {isAdmin 
-                ? 'Admin dashboard for managing quizzes, questions, users, and platform managements.'
-                : 'Test your knowledge with our interactive quiz platform. Challenge yourself and climb the leaderboards!'
+              {isSuperAdmin 
+                ? 'Super Admin Command Center - Full platform visibility and control over all admins, users, quizzes, and results.'
+                : isAdmin 
+                  ? 'Admin dashboard for managing quizzes, questions, users, and platform management.'
+                  : 'Test your knowledge with our interactive quiz platform. Challenge yourself and climb the leaderboards!'
               }
             </p>
           </div>
@@ -35,24 +38,35 @@ const Footer = () => {
             <h4 className="footer-title">Quick Links</h4>
             <ul className="footer-links">
               <li><Link to="/">Home</Link></li>
-              {!isAdmin && (
+              {!isAdmin && !isSuperAdmin && (
                 <>
                   <li><Link to="/quizzes">Quizzes</Link></li>
                   <li><Link to="/dashboard">Dashboard</Link></li>
                 </>
               )}
               <li><Link to="/chat">Chat</Link></li>
-              {isAdmin && (
+              {isSuperAdmin && (
+                <>
+                  <li><Link to="/super-admin">Command Center</Link></li>
+                  <li><Link to="/admin">Admin Panel</Link></li>
+                </>
+              )}
+              {isAdmin && !isSuperAdmin && (
                 <li><Link to="/admin">Admin Dashboard</Link></li>
               )}
               {isAuthenticated && <li><Link to="/profile">Profile</Link></li>}
             </ul>
           </div>
 
-          {isAdmin && (
+          {(isAdmin || isSuperAdmin) && (
             <div className="footer-section">
-              <h4 className="footer-title">Admin Resources</h4>
+              <h4 className="footer-title">
+                {isSuperAdmin ? 'Super Admin Resources' : 'Admin Resources'}
+              </h4>
               <ul className="footer-links">
+                {isSuperAdmin && (
+                  <li><Link to="/super-admin">Command Center</Link></li>
+                )}
                 <li><Link to="/admin/quizzes">Manage Quizzes</Link></li>
                 <li><Link to="/admin">Admin Dashboard</Link></li>
                 <li><Link to="/admin/users">User Management</Link></li>
@@ -107,7 +121,8 @@ const Footer = () => {
         <div className="footer-bottom">
           <div className="footer-copyright">
             &copy; {currentYear} King Ice Quiz. All rights reserved.
-            {isAdmin && <span className="admin-footer-badge"> • Admin Mode</span>}
+            {isSuperAdmin && <span className="admin-footer-badge" style={{ color: '#f59e0b', fontWeight: 'bold' }}> • Super Admin Mode</span>}
+            {isAdmin && !isSuperAdmin && <span className="admin-footer-badge"> • Admin Mode</span>}
           </div>
           <div className="footer-social">
             <span>Follow us:</span>

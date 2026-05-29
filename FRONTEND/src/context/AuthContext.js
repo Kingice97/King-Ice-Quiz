@@ -310,7 +310,7 @@ export const AuthProvider = ({ children }) => {
     return null;
   };
 
-  const value = {
+ const value = {
     user: getSafeUser(),
     login,
     register,
@@ -324,7 +324,8 @@ export const AuthProvider = ({ children }) => {
     error,
     clearError,
     isAuthenticated: !!getSafeUser(),
-    isAdmin: getSafeUser()?.role === 'admin'
+    isAdmin: getSafeUser()?.role === 'admin' || getSafeUser()?.role === 'superadmin',
+    isSuperAdmin: getSafeUser()?.isSuperAdmin || false,  // ADD THIS
   };
 
   return (

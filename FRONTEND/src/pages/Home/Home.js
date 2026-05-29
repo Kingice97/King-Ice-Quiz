@@ -6,38 +6,173 @@ import { quizService } from '../../services/quizService';
 import { userService } from '../../services/userService';
 import QuizCard from '../../components/quiz/QuizCard/QuizCard';
 import Loading from '../../components/common/Loading/Loading';
-import { FaBrain, FaRocket, FaChartBar, FaTrophy, FaComments, FaBook, FaBolt, FaUsers, FaChartLine, FaEdit, FaCog, FaKey } from 'react-icons/fa';
+import { FaBrain, FaRocket, FaChartBar, FaTrophy, FaComments, FaBook, FaBolt, FaUsers, FaChartLine, FaEdit, FaCog, FaKey, FaCrown, FaUserShield } from 'react-icons/fa';
 import './Home.css';
 
 const Home = () => {
   const { isAuthenticated, user, isAdmin } = useAuth();
-const { data: quizzesData, loading: quizzesLoading } = useApi(() => {
-  if (isAdmin) {
-    return quizService.getAdminQuizzes({ limit: 100 });
-  }
-  return quizService.getQuizzes({ limit: 6 });
-}, null, [isAdmin, isAuthenticated]);
-  const { data: usersData, loading: usersLoading } = useApi(() =>
-    userService.getUsers({ limit: 100 })
-  );
-  const { data: resultsData, loading: resultsLoading } = useApi(() =>
-    quizService.getRecentResults({ limit: 100 })
-  );
+  const isSuperAdmin = user?.isSuperAdmin || false;
 
-  // REMOVED: leaderboard data fetching
+  // Super admin data fetching
+  const { data: superAdminDashboard, loading: saLoading } = useApi(() =>
+    isSuperAdmin ? userService.getSuperAdminDashboard() : Promise.resolve({ data: null })
+  , null, [isSuperAdmin]);
+
+  // Regular quizzes for admin/users
+  const { data: quizzesData, loading: quizzesLoading } = useApi(() => {
+    if (isSuperAdmin) return Promise.resolve({ data: [] });
+    if (isAdmin) return quizService.getAdminQuizzes({ limit: 100 });
+    return quizService.getQuizzes({ limit: 6 });
+  }, null, [isAdmin, isAuthenticated, isSuperAdmin]);
+
+  const { data: usersData, loading: usersLoading } = useApi(() =>
+    isSuperAdmin ? Promise.resolve({ data: [] }) : userService.getUsers({ limit: 100 })
+  , null, [isSuperAdmin]);
+
+  const { data: resultsData, loading: resultsLoading } = useApi(() =>
+    isSuperAdmin ? Promise.resolve({ data: [] }) : quizService.getRecentResults({ limit: 100 })
+  , null, [isSuperAdmin]);
+
+  // Super admin stats from API
+  const saStats = superAdminDashboard?.data?.stats || {};
+  const saAdmins = superAdminDashboard?.data?.admins || [];
+  
   const featuredQuizzes = quizzesData?.data || [];
   const users = usersData?.data || [];
   const results = resultsData?.data || [];
 
   const activeQuizzes = featuredQuizzes.length;
-  const regularUsers = users.filter(user => user.role === 'user');
+  const regularUsers = users.filter(u => u.role === 'user');
   const totalUsers = regularUsers.length;
   const totalAttempts = results.length;
   
-  const activeUsers = regularUsers.filter(user => 
-    user.isActive === true || 
-    (user.lastLogin && new Date(user.lastLogin) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+  const activeUsers = regularUsers.filter(u => 
+    u.isActive === true || 
+    (u.lastLogin && new Date(u.lastLogin) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
   ).length;
+
+  // SUPER ADMIN VIEW
+  if (isSuperAdmin) {
+    return (
+      <div className="home">
+        {/* Super Admin Hero */}
+        <section className="hero" style={{ 
+          background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+          borderBottom: '3px solid #f59e0b'
+        }}>
+          <div className="hero-content">
+            <div className="hero-text">
+              <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#fff' }}>
+                <FaCrown style={{ color: '#fbbf24', fontSize: '2rem', filter: 'drop-shadow(0 0 8px rgba(251,191,36,0.5))' }} />
+                Super Admin Command Center
+              </h1>
+              <p style={{ color: '#e2e8f0', fontSize: '1.1rem', lineHeight: '1.6' }}>
+                You have full visibility and control over the entire King Ice Quiz platform.
+                Monitor all admins, users, quizzes, and results from one place.
+              </p>
+              <div className="hero-actions">
+                <Link to="/super-admin" className="btn btn-primary btn-lg" style={{ 
+                  background: '#f59e0b', 
+                  color: '#1a1a2e', 
+                  border: 'none',
+                  fontWeight: 700,
+                  boxShadow: '0 4px 15px rgba(245,158,11,0.4)'
+                }}>
+                  <FaCrown /> Open Command Center
+                </Link>
+              </div>
+            </div>
+            <div className="hero-image">
+              <div className="hero-graphic" style={{ 
+                background: 'rgba(251, 191, 36, 0.1)', 
+                border: '2px solid rgba(251, 191, 36, 0.3)',
+                boxShadow: '0 0 30px rgba(251,191,36,0.15)'
+              }}>
+                <FaCrown style={{ fontSize: '70px', color: '#fbbf24' }} />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Platform Overview - Using super admin API data */}
+        <section className="admin-stats" style={{ background: '#f8fafc', padding: '3rem 0' }}>
+          <div className="container">
+            <h2 style={{ color: '#1e293b', textAlign: 'center', marginBottom: '2rem' }}>
+              <FaChartBar style={{ marginRight: '8px', color: '#f59e0b' }} />
+              Platform Overview
+            </h2>
+            {saLoading ? (
+              <Loading text="Loading platform data..." />
+            ) : (
+              <div className="stats-grid" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                <div className="stat-card" style={{ border: '2px solid #f59e0b', background: '#fffbeb' }}>
+                  <div className="stat-icon"><FaUserShield style={{ color: '#f59e0b' }} /></div>
+                  <div className="stat-info">
+                    <span className="stat-value" style={{ color: '#92400e' }}>{saStats.totalAdmins || saAdmins.length || 0}</span>
+                    <span className="stat-label">Admins</span>
+                  </div>
+                </div>
+                <div className="stat-card" style={{ border: '2px solid #3b82f6', background: '#eff6ff' }}>
+                  <div className="stat-icon"><FaUsers style={{ color: '#3b82f6' }} /></div>
+                  <div className="stat-info">
+                    <span className="stat-value" style={{ color: '#1e40af' }}>{saStats.totalRegularUsers || saStats.totalUsers || 0}</span>
+                    <span className="stat-label">Users</span>
+                  </div>
+                </div>
+                <div className="stat-card" style={{ border: '2px solid #8b5cf6', background: '#f5f3ff' }}>
+                  <div className="stat-icon"><FaEdit style={{ color: '#8b5cf6' }} /></div>
+                  <div className="stat-info">
+                    <span className="stat-value" style={{ color: '#5b21b6' }}>{saStats.totalQuizzes || 0}</span>
+                    <span className="stat-label">Quizzes</span>
+                  </div>
+                </div>
+                <div className="stat-card" style={{ border: '2px solid #10b981', background: '#ecfdf5' }}>
+                  <div className="stat-icon"><FaChartLine style={{ color: '#10b981' }} /></div>
+                  <div className="stat-info">
+                    <span className="stat-value" style={{ color: '#065f46' }}>{saStats.totalResults || 0}</span>
+                    <span className="stat-label">Attempts</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Quick Actions */}
+        <section className="admin-actions" style={{ background: '#fff', padding: '3rem 0' }}>
+          <div className="container">
+            <h2 style={{ color: '#1e293b', textAlign: 'center', marginBottom: '2rem' }}>Quick Actions</h2>
+            <div className="actions-grid" style={{ maxWidth: '900px', margin: '0 auto' }}>
+              <Link to="/super-admin" className="action-card" style={{ border: '2px solid #f59e0b', background: '#fffbeb' }}>
+                <div className="action-icon"><FaCrown style={{ color: '#f59e0b' }} /></div>
+                <div className="action-content">
+                  <h3 style={{ color: '#92400e' }}>Command Center</h3>
+                  <p style={{ color: '#a16207' }}>Full platform analytics, all admins, users, quizzes & results</p>
+                </div>
+                <div className="action-arrow" style={{ color: '#f59e0b' }}>→</div>
+              </Link>
+              <Link to="/super-admin" className="action-card">
+                <div className="action-icon"><FaUserShield /></div>
+                <div className="action-content">
+                  <h3>View All Admins</h3>
+                  <p>See every admin, their quizzes, and their students' performance</p>
+                </div>
+                <div className="action-arrow">→</div>
+              </Link>
+              <Link to="/super-admin" className="action-card">
+                <div className="action-icon"><FaUsers /></div>
+                <div className="action-content">
+                  <h3>All Users & Results</h3>
+                  <p>Monitor every user and quiz attempt across the entire platform</p>
+                </div>
+                <div className="action-arrow">→</div>
+              </Link>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   // ADMIN VIEW
   if (isAdmin) {
@@ -206,7 +341,6 @@ const { data: quizzesData, loading: quizzesLoading } = useApi(() => {
           </div>
         </section>
 
-        {/* Available Public Quizzes */}
         <section className="featured-quizzes">
           <div className="container">
             <div className="section-header">

@@ -51,6 +51,7 @@ exports.register = async (req, res, next) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        isSuperAdmin: user.isSuperAdmin || false,
         profile: user.profile,
         profilePicture: user.profilePicture, // NEW: Include profile picture
         isOnline: user.isOnline, // NEW: Include online status
@@ -124,6 +125,7 @@ exports.login = async (req, res, next) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        isSuperAdmin: user.isSuperAdmin || false,  // ADD THIS LINE
         profile: user.profile,
         profilePicture: user.profilePicture, // NEW: Include profile picture
         isOnline: user.isOnline, // NEW: Include online status
@@ -153,6 +155,7 @@ exports.getMe = async (req, res, next) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        isSuperAdmin: user.isSuperAdmin || false,
         profile: user.profile,
         profilePicture: user.profilePicture, // NEW: Include profile picture
         isOnline: user.isOnline, // NEW: Include online status
@@ -227,6 +230,7 @@ exports.updateProfile = async (req, res, next) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        isSuperAdmin: user.isSuperAdmin || false,
         profile: user.profile,
         profilePicture: user.profilePicture, // NEW: Include profile picture
         preferences: user.preferences, // NEW: Include preferences

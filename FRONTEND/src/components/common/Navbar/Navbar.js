@@ -33,11 +33,12 @@ const Navbar = () => {
 
   const navItems = [
     { path: '/', icon: <FaHome />, label: 'Home', show: true },
-    { path: '/join', icon: <FaKey />, label: 'Join Quiz', show: !isAdmin },
-    { path: '/quizzes', icon: <FaBook />, label: 'Browse Quizzes', show: !isAdmin },
+    { path: '/super-admin', icon: <FaCrown />, label: 'Command Center', show: isAuthenticated && user?.isSuperAdmin },
+    { path: '/join', icon: <FaKey />, label: 'Join Quiz', show: !isAdmin && !user?.isSuperAdmin },
+    { path: '/quizzes', icon: <FaBook />, label: 'Browse Quizzes', show: !isAdmin && !user?.isSuperAdmin },
     { path: '/chat', icon: <FaComments />, label: 'Chat Room', show: true },
-    { path: '/dashboard', icon: <FaChartBar />, label: 'My Dashboard', show: isAuthenticated && !isAdmin },
-    { path: '/admin', icon: <FaCog />, label: 'Admin Panel', show: isAuthenticated && isAdmin },
+    { path: '/dashboard', icon: <FaChartBar />, label: 'My Dashboard', show: isAuthenticated && !isAdmin && !user?.isSuperAdmin },
+    { path: '/admin', icon: <FaCog />, label: 'Admin Panel', show: isAuthenticated && isAdmin && !user?.isSuperAdmin },
     { path: '/profile', icon: <FaUser />, label: 'My Profile', show: isAuthenticated },
   ];
 
@@ -115,10 +116,11 @@ const Navbar = () => {
                 </div>
                 <div className="user-meta">
                   <span className="user-display-name">{user?.username}</span>
-                  <span className="user-role-badge">
-                    {isAdmin && <><FaCrown /> Admin</>}
-                    {!isAdmin && 'Learner'}
-                  </span>
+                 <span className="user-role-badge">
+  {user?.isSuperAdmin && <><FaCrown /> Super Admin</>}
+  {isAdmin && !user?.isSuperAdmin && <>Admin</>}
+  {!isAdmin && !user?.isSuperAdmin && 'Learner'}
+</span>
                 </div>
               </div>
               <button className="btn-logout" onClick={handleLogout}>

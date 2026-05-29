@@ -9,7 +9,6 @@
   background: var(--gray-900);
 }
 
-/* FIXED: Match Home page container exactly */
 .profile-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -35,41 +34,54 @@
 
 .profile-avatar {
   flex-shrink: 0;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* FIXED: WhatsApp-style profile picture - fills entire circle */
 .avatar-container {
   position: relative;
   width: 120px;
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  transition: all var(--transition-fast);
   cursor: pointer;
-  /* Remove border and background to fill circle completely */
-  border: none;
-  background: none;
+  border: 3px solid var(--gray-200);
+  margin: 0 auto;
+  transition: all var(--transition-fast);
+}
+
+.dark .avatar-container {
+  border-color: var(--gray-600);
 }
 
 .avatar-container:hover {
   transform: scale(1.05);
 }
 
-.avatar-container.has-image:hover .avatar-overlay {
-  opacity: 1;
-}
-
-/* FIXED: Profile picture fills entire circle with no spaces */
 .profile-picture {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
   display: block;
-  /* Ensure no borders or spaces */
   border: none;
   margin: 0;
   padding: 0;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--white);
+  border: none;
 }
 
 .avatar-overlay {
@@ -89,44 +101,55 @@
   font-weight: 500;
 }
 
-/* FIXED: Avatar placeholder fills entire circle */
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+.avatar-container:hover .avatar-overlay {
+  opacity: 1;
+}
+
+/* Hide old online status */
+.online-status {
+  display: none;
+}
+
+/* Profile Badges - below avatar */
+.profile-badges {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 6px;
+}
+
+.role-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
-  color: var(--white);
-  /* Remove border to fill circle completely */
-  border: none;
+  gap: 4px;
+  white-space: nowrap;
 }
 
-/* FIXED: Online status that doesn't cover profile picture */
-.online-status {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  background: rgba(0, 0, 0, 0.9);
+.super-admin-badge {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #1e1b4b;
+}
+
+.admin-badge {
+  background: #6366f1;
   color: white;
-  padding: 3px 8px;
-  border-radius: 10px;
-  font-size: 0.65rem;
+  position: static;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
   font-weight: 600;
-  z-index: 2;
-  border: 2px solid var(--white);
-  line-height: 1;
-}
-
-.online-status.online {
-  background: var(--success-color);
-}
-
-.online-status.offline {
-  background: var(--gray-500);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: none;
+  z-index: auto;
 }
 
 .profile-info {
@@ -142,7 +165,7 @@
 }
 
 .dark .profile-info h1 {
-  color: var(--gray-100); /* FIXED: Brighter heading */
+  color: var(--gray-100);
 }
 
 .profile-info p {
@@ -152,7 +175,7 @@
 }
 
 .dark .profile-info p {
-  color: var(--gray-300); /* FIXED: Brighter text */
+  color: var(--gray-300);
 }
 
 .profile-actions {
@@ -161,7 +184,6 @@
   flex-wrap: wrap;
 }
 
-/* FIXED: Open Chat button hover */
 .profile-actions .btn-primary {
   background-color: var(--primary-color);
   color: var(--text-inverse) !important;
@@ -182,22 +204,6 @@
 .dark .profile-actions .btn-primary:hover {
   background-color: var(--primary-light);
   color: var(--text-inverse) !important;
-}
-
-.admin-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: var(--danger-color);
-  color: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: var(--shadow-sm);
-  z-index: 2;
 }
 
 .profile-stats {
@@ -232,7 +238,7 @@
 }
 
 .dark .stat-value {
-  color: var(--primary-light); /* FIXED: Brighter stat value */
+  color: var(--primary-light);
 }
 
 .stat-label {
@@ -243,7 +249,7 @@
 }
 
 .dark .stat-label {
-  color: var(--gray-300); /* FIXED: Brighter label */
+  color: var(--gray-300);
 }
 
 .admin-stats-message {
@@ -396,12 +402,11 @@
   margin-bottom: var(--spacing-2xl);
 }
 
-/* FIXED: Section header line positioned higher */
 .info-section h3 {
   color: var(--gray-900);
   margin-bottom: var(--spacing-lg);
   border-bottom: 2px solid var(--gray-200);
-  padding-bottom: var(--spacing-xs); /* FIXED: Reduced padding to move line up */
+  padding-bottom: var(--spacing-xs);
   font-size: clamp(1.1rem, 3vw, 1.5rem);
 }
 
@@ -433,7 +438,7 @@
 }
 
 .dark .info-item label {
-  color: var(--gray-300); /* FIXED: Brighter label */
+  color: var(--gray-300);
 }
 
 .info-item span {
@@ -443,7 +448,7 @@
 }
 
 .dark .info-item span {
-  color: var(--gray-300); /* FIXED: Brighter text */
+  color: var(--gray-300);
 }
 
 .role {
@@ -461,9 +466,9 @@
   color: var(--primary-color);
 }
 
-.role.admin {
-  background: rgba(231, 76, 60, 0.1);
-  color: var(--danger-color);
+.role.admin, .role.superadmin {
+  background: rgba(245, 158, 11, 0.15);
+  color: #92400e;
 }
 
 .chat-status.connected {
@@ -507,19 +512,18 @@
 }
 
 .dark .admin-message p {
-  color: var(--gray-300); /* FIXED: Brighter text */
+  color: var(--gray-300);
 }
 
 .bio-section {
   margin-bottom: var(--spacing-2xl);
 }
 
-/* FIXED: Bio section header line positioned higher */
 .bio-section h3 {
   color: var(--gray-900);
   margin-bottom: var(--spacing-lg);
   border-bottom: 2px solid var(--gray-200);
-  padding-bottom: var(--spacing-xs); /* FIXED: Reduced padding to move line up */
+  padding-bottom: var(--spacing-xs);
 }
 
 .dark .bio-section h3 {
@@ -535,7 +539,7 @@
 }
 
 .dark .bio-section p {
-  color: var(--gray-300); /* FIXED: Brighter text */
+  color: var(--gray-300);
 }
 
 .results-list {
@@ -577,7 +581,7 @@
 }
 
 .dark .quiz-info h4 {
-  color: var(--gray-200); /* FIXED: Brighter heading */
+  color: var(--gray-200);
 }
 
 .quiz-info p {
@@ -588,7 +592,7 @@
 }
 
 .dark .quiz-info p {
-  color: var(--gray-300); /* FIXED: Brighter text */
+  color: var(--gray-300);
 }
 
 .result-info {
@@ -697,7 +701,7 @@
 }
 
 .dark .empty-state {
-  color: var(--gray-300); /* FIXED: Brighter empty state */
+  color: var(--gray-300);
 }
 
 .stats-loading {
@@ -753,89 +757,6 @@
   margin-top: var(--spacing-sm);
 }
 
-/* FIXED: Mobile styles with proper online status positioning */
-@media (max-width: 768px) {
-  .profile-page {
-    padding: var(--spacing-lg) 0;
-  }
-  
-  .profile-container {
-    padding: 0 var(--spacing-sm);
-  }
-  
-  .profile-header {
-    flex-direction: column;
-    text-align: center;
-    gap: var(--spacing-lg);
-    padding: var(--spacing-xl);
-  }
-  
-  /* FIXED: Mobile avatar with online status that doesn't cover */
-  .profile-avatar {
-    position: relative;
-    margin-bottom: 10px;
-  }
-  
-  .avatar-container {
-    width: 100px;
-    height: 100px;
-    margin: 0 auto;
-  }
-  
-  /* FIXED: Mobile online status - much smaller and better positioned */
-  .online-status {
-    bottom: 2px;
-    right: 2px;
-    font-size: 0.6rem;
-    padding: 2px 6px;
-    border-width: 1px;
-  }
-  
-  .profile-stats {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .profile-tabs {
-    flex-direction: column;
-  }
-  
-  .tab-content {
-    padding: var(--spacing-xl);
-    min-height: 300px;
-  }
-  
-  /* Show upload hint on mobile */
-  .avatar-container .avatar-overlay {
-    opacity: 0.8;
-    background: rgba(0, 0, 0, 0.6);
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .profile-stats {
-    grid-template-columns: 1fr;
-  }
-  
-  .profile-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .avatar-container {
-    width: 80px;
-    height: 80px;
-  }
-  
-  /* Extra small mobile online status */
-  .online-status {
-    bottom: 1px;
-    right: 1px;
-    font-size: 0.55rem;
-    padding: 1px 4px;
-  }
-}
-
 /* Admin message card - light mode fix */
 .admin-message-card {
   color: var(--gray-900);
@@ -875,4 +796,114 @@
 
 .dark .admin-stat-icon {
   color: var(--primary-light);
+}
+
+/* Dark mode fixes for super admin */
+.dark .admin-message-card {
+  background: #1e293b !important;
+  border-color: #f59e0b !important;
+}
+
+.dark .admin-message-card h3 span {
+  color: #fbbf24 !important;
+}
+
+.dark .admin-message-card p {
+  color: #e2e8f0 !important;
+}
+
+.dark .admin-message-card .admin-stat {
+  background: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+.dark .admin-action-btn {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+.dark .admin-action-btn:hover {
+  background: #334155 !important;
+  border-color: #f59e0b !important;
+}
+
+/* ========== MOBILE ========== */
+@media (max-width: 768px) {
+  .profile-page {
+    padding: var(--spacing-lg) 0;
+  }
+  
+  .profile-container {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-xl);
+  }
+  
+  .profile-avatar {
+    position: relative;
+    margin-bottom: 10px;
+  }
+  
+  .avatar-container {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+  }
+  
+  .profile-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .profile-tabs {
+    flex-direction: column;
+  }
+  
+  .tab-content {
+    padding: var(--spacing-xl);
+    min-height: 300px;
+  }
+  
+  .avatar-container .avatar-overlay {
+    opacity: 0.8;
+    background: rgba(0, 0, 0, 0.6);
+    font-size: 0.8rem;
+  }
+  
+  .profile-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+  }
+  
+  .profile-actions .btn {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+  
+  .role-badge {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .profile-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .avatar-container {
+    width: 80px;
+    height: 80px;
+  }
 }

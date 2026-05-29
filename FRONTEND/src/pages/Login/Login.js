@@ -13,7 +13,7 @@ const Login = () => {
   const handleLogin = async (formData) => {
     try {
       await login(formData);
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       // Error is handled by AuthContext
     }

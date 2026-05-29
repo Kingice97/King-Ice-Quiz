@@ -13,7 +13,7 @@ const Register = () => {
   const handleRegister = async (formData) => {
     try {
       await register(formData);
-      navigate('/dashboard');
+      navigate('/');
     } catch (error) {
       // Error is handled by AuthContext
     }

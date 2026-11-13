@@ -26,6 +26,7 @@ import UserProfile from './pages/UserProfile/UserProfile';
 import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy';
 import JoinQuiz from './pages/JoinQuiz/JoinQuiz';
 import SuperAdmin from './pages/SuperAdmin/SuperAdmin';
+import About from './pages/About/About';
 
 // Chat Pages
 import Chat from './pages/Chat/Chat';
@@ -438,6 +439,7 @@ function App() {
                 />
                 
                 <Route path="/privacy-policy" element={<Layout><PrivacyPolicy /></Layout>} />
+                <Route path="/about" element={<Layout><About /></Layout>} />
                 <Route path="*" element={<Layout><NotFound /></Layout>} />
               </Routes>
             </Router>

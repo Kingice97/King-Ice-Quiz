@@ -114,13 +114,14 @@ const Footer = () => {
                   Terms of Service
                 </a>
               </li>
+              <li><Link to="/about">About & Creator</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="footer-bottom">
           <div className="footer-copyright">
-            &copy; {currentYear} King Ice Quiz. All rights reserved.
+            &copy; {currentYear} King Ice Quiz. Developed by <Link to="/about" style={{ color: '#f59e0b', fontWeight: 'bold', textDecoration: 'none' }}>Olubiyi Isaac Anu</Link>.
             {isSuperAdmin && <span className="admin-footer-badge" style={{ color: '#f59e0b', fontWeight: 'bold' }}> • Super Admin Mode</span>}
             {isAdmin && !isSuperAdmin && <span className="admin-footer-badge"> • Admin Mode</span>}
           </div>
